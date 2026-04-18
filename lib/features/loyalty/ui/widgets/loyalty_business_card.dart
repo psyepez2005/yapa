@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart'; // ✅ IMPORT NECESARIO
+import 'package:go_router/go_router.dart';
 
 class LoyaltyBusinessCard extends StatefulWidget {
   final String businessName;
@@ -13,6 +13,8 @@ class LoyaltyBusinessCard extends StatefulWidget {
   final String nextLevel;
   final int purchasesNeeded;
   final IconData businessIcon;
+  final int currentPoints;
+  final int targetPoints;
 
   const LoyaltyBusinessCard({
     super.key,
@@ -27,6 +29,8 @@ class LoyaltyBusinessCard extends StatefulWidget {
     required this.nextLevel,
     required this.purchasesNeeded,
     required this.businessIcon,
+    required this.currentPoints,
+    required this.targetPoints,
   });
 
   @override
@@ -88,7 +92,6 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
             });
           },
           onTap: () {
-            // ✅ Navegación corregida
             context.pushNamed(
               'business_detail',
               extra: {
@@ -96,6 +99,9 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                 'icon': widget.businessIcon,
                 'tier': widget.tierName,
                 'cashback': widget.cashbackPercentage,
+                // ✅ CORRECCIÓN: Faltaba el 'widget.' aquí
+                'currentPoints': widget.currentPoints,
+                'targetPoints': widget.targetPoints,
               },
             );
           },
@@ -176,9 +182,7 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 16),
-
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: LinearProgressIndicator(
@@ -188,9 +192,7 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                     minHeight: 8,
                   ),
                 ),
-
                 const SizedBox(height: 12),
-
                 if (widget.purchasesNeeded > 0)
                   Row(
                     children: [
@@ -235,7 +237,6 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                       ),
                     ],
                   ),
-
                 if (_isExpanded) ...[
                   const SizedBox(height: 16),
                   Container(

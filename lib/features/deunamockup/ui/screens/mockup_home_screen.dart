@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../widgets/mockup_app_bar.dart';
 import '../widgets/mockup_balance_card.dart';
@@ -34,7 +35,8 @@ class MockupHomeScreen extends StatelessWidget {
         width: double.infinity,
         height: 56,
         child: FloatingActionButton.extended(
-          onPressed: () {},
+          // ✅ ACÁ CONECTAMOS LA NAVEGACIÓN
+          onPressed: () => context.pushNamed('qr_scanner'), 
           backgroundColor: const Color(0xFF4A1587),
           elevation: 2,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

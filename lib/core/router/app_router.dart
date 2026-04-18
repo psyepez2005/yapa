@@ -1,11 +1,9 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
-import 'package:yapa/features/loyalty/ui/screens/business_detail_screen.dart';
-
-// Importaremos las pantallas cuando las creemos. 
-// Por ahora usamos placeholders para que no marque error.
 import '../../features/deunamockup/ui/screens/mockup_home_screen.dart';
+import '../../features/deunamockup/ui/screens/mockup_qr_scanner_screen.dart';
 import '../../features/loyalty/ui/screens/loyalty_dashboard_screen.dart';
+import '../../features/loyalty/ui/screens/business_detail_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -16,24 +14,37 @@ class AppRouter {
         name: 'mockup_home',
         builder: (context, state) => const MockupHomeScreen(),
       ),
-      // Configuración de tu pantalla de Loyalty
       GoRoute(
         path: '/loyalty',
-        name: 'loyalty_dashboard', // Este nombre es el que usaremos para navegar
+        name: 'loyalty_dashboard',
         builder: (context, state) => const LoyaltyDashboardScreen(),
       ),
+      GoRoute(
+        path: '/qr-scanner',
+        name: 'qr_scanner',
+        builder: (context, state) => const MockupQrScannerScreen(),
+      ),
+      // ✅ Pantalla de detalle corregida (Sin Placeholder)
       GoRoute(
         path: '/business-detail',
         name: 'business_detail',
         builder: (context, state) {
-          // Extraemos el mapa de datos que enviaremos al navegar
           final data = state.extra as Map<String, dynamic>;
+          
+          final mockTransactions = [
+            {'date': '18 Abr 2026, 10:30', 'amount': 15.50, 'points': 15},
+            {'date': '15 Abr 2026, 14:15', 'amount': 8.00, 'points': 8},
+            {'date': '10 Abr 2026, 09:00', 'amount': 22.40, 'points': 22},
+          ];
           
           return BusinessDetailScreen(
             businessName: data['name'],
             businessIcon: data['icon'],
             tierName: data['tier'],
             cashbackPercentage: data['cashback'],
+            currentTrustPoints: data['currentPoints'] ?? 0,
+            targetTrustPoints: data['targetPoints'] ?? 100,
+            transactions: data['transactions'] ?? mockTransactions, 
           );
         },
       ),

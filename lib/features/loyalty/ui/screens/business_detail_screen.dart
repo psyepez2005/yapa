@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:yapa/features/deunamockup/ui/widgets/mockup_bottom_nav.dart';
 
+// Importa tus widgets locales
+import '../widgets/business_header.dart';
+import '../widgets/transaction_list_item.dart';
+import '../widgets/trust_points_progress.dart'; // <-- No olvides importar este también
+
 class BusinessDetailScreen extends StatelessWidget {
   final String businessName;
   final IconData businessIcon;
   final String tierName;
   final String cashbackPercentage;
+  final List<Map<String, dynamic>> transactions;
+  
+  // VARIABLES FALTANTES AGREGADAS AQUÍ:
+  final int currentTrustPoints;
+  final int targetTrustPoints;
 
   const BusinessDetailScreen({
     super.key,
@@ -13,19 +23,13 @@ class BusinessDetailScreen extends StatelessWidget {
     required this.businessIcon,
     required this.tierName,
     required this.cashbackPercentage,
+    required this.transactions,
+    required this.currentTrustPoints, // <-- Agregado al constructor
+    required this.targetTrustPoints,  // <-- Agregado al constructor
   });
 
   @override
   Widget build(BuildContext context) {
-    // Generamos un historial de transacciones de prueba
-    final transactions = [
-      {'date': '18 Abr 2026, 10:30', 'amount': 15.50, 'points': 15},
-      {'date': '15 Abr 2026, 14:15', 'amount': 8.00, 'points': 8},
-      {'date': '10 Abr 2026, 09:00', 'amount': 22.40, 'points': 22},
-      {'date': '05 Abr 2026, 18:45', 'amount': 5.25, 'points': 5},
-      {'date': '01 Abr 2026, 12:20', 'amount': 12.00, 'points': 12},
-    ];
-
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
       appBar: AppBar(
@@ -33,7 +37,7 @@ class BusinessDetailScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF4A1587), size: 20),
-          onPressed: () => Navigator.of(context).pop(), // Vuelve a la pantalla anterior
+          onPressed: () => Navigator.of(context).pop(), 
         ),
         title: const Text(
           'Detalle del Negocio',
@@ -43,7 +47,12 @@ class BusinessDetailScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          _buildBusinessHeader(),
+          BusinessHeader(
+            businessName: businessName,
+            businessIcon: businessIcon,
+            tierName: tierName,
+            cashbackPercentage: cashbackPercentage,
+          ),
           const SizedBox(height: 16),
           Expanded(
             child: Container(
@@ -72,7 +81,7 @@ class BusinessDetailScreen extends StatelessWidget {
                       separatorBuilder: (context, index) => Divider(color: Colors.grey.shade200, height: 1),
                       itemBuilder: (context, index) {
                         final tx = transactions[index];
-                        return _buildTransactionItem(
+                        return TransactionListItem(
                           date: tx['date'] as String,
                           amount: tx['amount'] as double,
                           points: tx['points'] as int,
@@ -84,113 +93,12 @@ class BusinessDetailScreen extends StatelessWidget {
               ),
             ),
           ),
-          MockupBottomNav(currentIndex: 1),
-        ],
-      ),
-    );
-  }
-
-  // --- Widgets internos para mantener el código limpio ---
-
-  Widget _buildBusinessHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        children: [
-          Container(
-            width: 80, height: 80,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5))
-              ]
-            ),
-            child: Icon(businessIcon, color: const Color(0xFF4A1587), size: 40),
+          // AÑADIMOS EL WIDGET DE PROGRESO AQUÍ ABAJO
+          TrustPointsProgress(
+            currentPoints: currentTrustPoints,
+            targetPoints: targetTrustPoints,
           ),
-          const SizedBox(height: 16),
-          Text(
-            businessName,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(color: const Color(0xFFFBE9E7), borderRadius: BorderRadius.circular(20)),
-                child: Text(
-                  tierName, 
-                  style: const TextStyle(color: Color(0xFFE64A19), fontSize: 14, fontWeight: FontWeight.bold)
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(color: const Color(0xFFE0F2F1), borderRadius: BorderRadius.circular(20)),
-                child: Text(
-                  '$cashbackPercentage Cashback', 
-                  style: const TextStyle(color: Color(0xFF00BFA5), fontSize: 14, fontWeight: FontWeight.bold)
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Acumula Puntos de Confianza con cada compra para mejorar tu nivel y ganar más beneficios.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey, fontSize: 14),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTransactionItem({required String date, required double amount, required int points}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Row(
-        children: [
-          Container(
-            width: 40, height: 40,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(Icons.receipt_long, color: Color(0xFF757575), size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Pago en local', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 4),
-                Text(date, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '-\$${amount.toStringAsFixed(2)}', 
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black)
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  const Icon(Icons.stars_rounded, color: Color(0xFF00BFA5), size: 14),
-                  const SizedBox(width: 4),
-                  Text(
-                    '+$points pts confianza', 
-                    style: const TextStyle(color: Color(0xFF00BFA5), fontSize: 12, fontWeight: FontWeight.bold)
-                  ),
-                ],
-              ),
-            ],
-          ),
+          const MockupBottomNav(currentIndex: 0),
         ],
       ),
     );
