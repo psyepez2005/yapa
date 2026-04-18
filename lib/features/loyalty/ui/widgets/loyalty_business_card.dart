@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'yapa_step_indicator.dart'; // Asegúrate de que la ruta sea correcta
 
 class LoyaltyBusinessCard extends StatefulWidget {
   final String businessName;
@@ -13,8 +14,7 @@ class LoyaltyBusinessCard extends StatefulWidget {
   final String nextLevel;
   final int purchasesNeeded;
   final IconData businessIcon;
-  final int currentPoints;
-  final int targetPoints;
+  final int currentYapas; // ✅ Cambiado a Yapas (0 a 5)
 
   const LoyaltyBusinessCard({
     super.key,
@@ -29,8 +29,7 @@ class LoyaltyBusinessCard extends StatefulWidget {
     required this.nextLevel,
     required this.purchasesNeeded,
     required this.businessIcon,
-    required this.currentPoints,
-    required this.targetPoints,
+    required this.currentYapas,
   });
 
   @override
@@ -99,9 +98,8 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                 'icon': widget.businessIcon,
                 'tier': widget.tierName,
                 'cashback': widget.cashbackPercentage,
-                // ✅ CORRECCIÓN: Faltaba el 'widget.' aquí
-                'currentPoints': widget.currentPoints,
-                'targetPoints': widget.targetPoints,
+                'currentPoints': widget.currentYapas, // Mandamos las yapas al router
+                'targetPoints': 5, // La meta siempre es 5
               },
             );
           },
@@ -133,18 +131,15 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                         children: [
                           Text(
                             widget.businessName,
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           Text(
                             '${widget.category} · ${widget.location}',
-                            style: const TextStyle(
-                                color: Colors.grey, fontSize: 13),
+                            style: const TextStyle(color: Colors.grey, fontSize: 13),
                           ),
                           const SizedBox(height: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
                               color: tierBgColor,
                               borderRadius: BorderRadius.circular(15),
@@ -175,14 +170,28 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                         const SizedBox(height: 4),
                         Text(
                           '${widget.visits} visitas',
-                          style: const TextStyle(
-                              color: Colors.grey, fontSize: 13),
+                          style: const TextStyle(color: Colors.grey, fontSize: 13),
                         ),
                       ],
                     ),
                   ],
                 ),
+                
                 const SizedBox(height: 16),
+                const Text(
+                  'Yapas ganadas en este local',
+                  style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                
+                // ✅ LOS CIRCULITOS DE YAPA
+                YapaStepIndicator(
+                  currentSteps: widget.currentYapas,
+                  totalSteps: 5,
+                ),
+
+                const SizedBox(height: 16),
+
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: LinearProgressIndicator(
@@ -198,8 +207,7 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                     children: [
                       Text(
                         'Progreso ${(widget.progress * 100).toInt()}%  ➔  ',
-                        style: const TextStyle(
-                            color: Colors.grey, fontSize: 13),
+                        style: const TextStyle(color: Colors.grey, fontSize: 13),
                       ),
                       Expanded(
                         child: Text(
@@ -220,8 +228,7 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                     children: [
                       const Text(
                         'Progreso 100%  ➔  ',
-                        style: TextStyle(
-                            color: Colors.grey, fontSize: 13),
+                        style: TextStyle(color: Colors.grey, fontSize: 13),
                       ),
                       Expanded(
                         child: Text(
@@ -237,61 +244,6 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                       ),
                     ],
                   ),
-                if (_isExpanded) ...[
-                  const SizedBox(height: 16),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFAEDFF),
-                      borderRadius: BorderRadius.circular(16),
-                      border:
-                          Border.all(color: const Color(0xFFF3E5F5)),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF4A1587),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.handshake,
-                            color: Color(0xFFFBC02D),
-                            size: 16,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Pasa la Yapa',
-                                style: TextStyle(
-                                  color: Color(0xFF4A1587),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Text(
-                                'Invita a un vecino a ${widget.businessName} y ambos ganan \$0.50',
-                                style: const TextStyle(
-                                    color: Colors.grey, fontSize: 11),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Icon(Icons.arrow_forward_ios,
-                            size: 14, color: Color(0xFF4A1587)),
-                      ],
-                    ),
-                  ),
-                ],
               ],
             ),
           ),

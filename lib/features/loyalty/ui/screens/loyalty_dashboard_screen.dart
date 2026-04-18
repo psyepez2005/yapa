@@ -9,25 +9,27 @@ class LoyaltyDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String currentTier = 'Plata';
-
+    // 🔹 Datos simulados de Base de Datos
     final businesses = [
       {
         'name': 'Tienda Don Pepe', 'category': 'Abarrotes', 'location': 'Quito',
         'tier': 'Bronce', 'cashback': '1%', 'minPurchase': '5', 'visits': 3, 'progress': 0.4, 
-        'nextLevel': 'Plata (2%)', 'needed': 2, 'currentPoints': 0, 'targetPoints': 100,'icon': Icons.storefront
+        'nextLevel': 'Plata (2%)', 'needed': 2, 'currentYapas': 3, 'icon': Icons.storefront
       },
       {
         'name': 'Farmacia El Barrio', 'category': 'Salud', 'location': 'Quito',
         'tier': 'Plata', 'cashback': '2%', 'minPurchase': '10', 'visits': 6, 'progress': 0.7, 
-        'nextLevel': 'Oro (3%)', 'needed': 5, 'currentPoints': 0, 'targetPoints': 100,'icon': Icons.local_pharmacy
+        'nextLevel': 'Oro (3%)', 'needed': 5, 'currentYapas': 1, 'icon': Icons.local_pharmacy
       },
       {
         'name': 'Panadería La Rosa', 'category': 'Comida', 'location': 'Quito',
         'tier': 'Oro', 'cashback': '3%', 'minPurchase': '3', 'visits': 12, 'progress': 1.0, 
-        'nextLevel': 'Nivel Máximo', 'needed': 0,'currentPoints': 0, 'targetPoints': 100, 'icon': Icons.bakery_dining
+        'nextLevel': 'Nivel Máximo', 'needed': 0, 'currentYapas': 5, 'icon': Icons.bakery_dining
       },
     ];
+
+    // ✅ SUMAMOS LAS YAPAS DE TODOS LOS NEGOCIOS (3 + 1 + 5 = 9)
+    final int totalYapasSum = businesses.fold(0, (sum, b) => sum + (b['currentYapas'] as int));
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
@@ -36,7 +38,10 @@ class LoyaltyDashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const LoyaltyHeader(),
-            LoyaltyGlobalProgress(currentTier: currentTier),
+            
+            // ✅ LE PASAMOS LA SUMA AL WIDGET GLOBAL
+            LoyaltyGlobalProgress(totalYapas: totalYapasSum),
+
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
@@ -44,6 +49,7 @@ class LoyaltyDashboardScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
               ),
             ),
+
             ...businesses.map((b) => LoyaltyBusinessCard(
               businessName: b['name'] as String,
               category: b['category'] as String,
@@ -56,10 +62,10 @@ class LoyaltyDashboardScreen extends StatelessWidget {
               nextLevel: b['nextLevel'] as String,
               purchasesNeeded: b['needed'] as int,
               businessIcon: b['icon'] as IconData,
-              // ✅ CORRECCIÓN: Le pasamos los datos que declaraste arriba
-              currentPoints: b['currentPoints'] as int,
-              targetPoints: b['targetPoints'] as int,
+              // ✅ LE PASAMOS LAS YAPAS INDIVIDUALES (0 a 5)
+              currentYapas: b['currentYapas'] as int,
             )).toList(),
+
             const SizedBox(height: 30),
           ],
         ),
