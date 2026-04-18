@@ -1,5 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:yapa/features/auth/ui/screens/login_screen.dart';
+import 'package:yapa/features/deunabusiness/ui/screens/business_mockup_screen.dart';
 import '../../features/deunamockup/ui/screens/mockup_home_screen.dart';
 import '../../features/deunamockup/ui/screens/mockup_qr_scanner_screen.dart';
 import '../../features/loyalty/ui/screens/loyalty_dashboard_screen.dart';
@@ -7,10 +9,20 @@ import '../../features/loyalty/ui/screens/business_detail_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/',
+    initialLocation: '/', // Inicia en el Login según tus últimos cambios
     routes: [
       GoRoute(
         path: '/',
+        name: 'login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/business',
+        name: 'business_mockup',
+        builder: (context, state) => const BusinessMockupScreen(),
+      ),
+      GoRoute(
+        path: '/mockup',
         name: 'mockup_home',
         builder: (context, state) => const MockupHomeScreen(),
       ),
@@ -24,7 +36,7 @@ class AppRouter {
         name: 'qr_scanner',
         builder: (context, state) => const MockupQrScannerScreen(),
       ),
-      // ✅ Pantalla de detalle corregida (Sin Placeholder)
+      // ✅ Pantalla de detalle conservada de la rama HEAD
       GoRoute(
         path: '/business-detail',
         name: 'business_detail',
