@@ -12,7 +12,7 @@ class LoyaltyGlobalProgress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -29,6 +29,16 @@ class LoyaltyGlobalProgress extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Yapa Total Header
+          Row(
+            children: const [
+              Text('💰', style: TextStyle(fontSize: 16)),
+              SizedBox(width: 8),
+              Text('Yapa total', style: TextStyle(color: Colors.grey, fontSize: 16)),
+            ],
+          ),
+          const SizedBox(height: 4),
+          // Amount and Usar button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
