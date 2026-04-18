@@ -45,7 +45,7 @@ class _PromoListCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // Colores alternados para las tarjetas de muestra
     final placeholderColors = [
-      const Color(0xFF4A1587), // Morado
+      const Color.fromARGB(255, 32, 167, 86), // Morado
       const Color(0xFF00BFA5), // Turquesa
       const Color(0xFFE64A19), // Naranja
     ];

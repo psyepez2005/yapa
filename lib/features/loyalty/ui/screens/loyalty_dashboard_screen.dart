@@ -9,7 +9,10 @@ class LoyaltyDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Datos actualizados incluyendo el monto mínimo
+
+    // 🔹 Esto simula que viene de lógica/navegación/estado
+    final String currentTier = 'Plata';
+
     final businesses = [
       {
         'name': 'Tienda Don Pepe', 'category': 'Abarrotes', 'location': 'Quito',
@@ -35,7 +38,10 @@ class LoyaltyDashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const LoyaltyHeader(),
-            const LoyaltyGlobalProgress(),
+
+            // 🔹 UI correcta + control dinámico
+            LoyaltyGlobalProgress(currentTier: currentTier),
+
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
@@ -43,23 +49,27 @@ class LoyaltyDashboardScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
               ),
             ),
+
             ...businesses.map((b) => LoyaltyBusinessCard(
               businessName: b['name'] as String,
               category: b['category'] as String,
               location: b['location'] as String,
               tierName: b['tier'] as String,
               cashbackPercentage: b['cashback'] as String,
-              minPurchaseAmount: b['minPurchase'] as String, // Pasando el nuevo dato
+              minPurchaseAmount: b['minPurchase'] as String,
               visits: b['visits'] as int,
               progress: b['progress'] as double,
               nextLevel: b['nextLevel'] as String,
               purchasesNeeded: b['needed'] as int,
               businessIcon: b['icon'] as IconData,
             )).toList(),
+
             const SizedBox(height: 30),
           ],
         ),
       ),
+
+      // 🔹 navegación (igual en ambos, pero lista para expandirse)
       bottomNavigationBar: const MockupBottomNav(currentIndex: 1),
     );
   }
