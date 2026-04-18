@@ -1,10 +1,11 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 
-// Importaremos las pantallas cuando las creemos. 
-// Por ahora usamos placeholders para que no marque error.
+// Importaremos las pantallas
 import '../../features/deunamockup/ui/screens/mockup_home_screen.dart';
 import '../../features/loyalty/ui/screens/loyalty_dashboard_screen.dart';
+import '../../features/auth/ui/screens/login_screen.dart';
+import '../../features/deunabusiness/ui/screens/business_mockup_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -12,6 +13,16 @@ class AppRouter {
     routes: [
       GoRoute(
         path: '/',
+        name: 'login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/business',
+        name: 'business_mockup',
+        builder: (context, state) => const BusinessMockupScreen(),
+      ),
+      GoRoute(
+        path: '/mockup',
         name: 'mockup_home',
         builder: (context, state) => const MockupHomeScreen(),
       ),
@@ -23,4 +34,4 @@ class AppRouter {
       ),
     ],
   );
-}
+}

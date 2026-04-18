@@ -35,7 +35,7 @@ class LoyaltyDashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const LoyaltyHeader(),
-            const LoyaltyGlobalProgress(),
+            const LoyaltyGlobalProgress(currentTier: 'Plata'),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
