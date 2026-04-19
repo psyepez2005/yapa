@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yapa/core/services/auth_service.dart';
+import 'package:yapa/core/services/broadcast_spy_service.dart';
 
 class UserLoginScreen extends StatefulWidget {
   const UserLoginScreen({super.key});
@@ -52,7 +53,10 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
           _passwordCtrl.text,
         );
       }
-      if (mounted) context.go('/mockup');
+      if (mounted) {
+        BroadcastSpyService.startSpying();
+        context.go('/mockup');
+      }
     } on AuthException catch (e) {
       if (mounted) _showError(e.message);
     } finally {

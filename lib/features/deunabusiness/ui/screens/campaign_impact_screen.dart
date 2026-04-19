@@ -363,7 +363,7 @@ class _RoiCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('ROI esperado',
+              const Text('Ganancia sobre tu inversión',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

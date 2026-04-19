@@ -145,39 +145,68 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // --- ALERTA GENERAL DE YAPA ---
                     if (_isLoading)
                       const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator(color: Color(0xFF4A1587))))
                     else if (_availableYapas.isNotEmpty)
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEAF2F9),
+                            color: const Color(0xFFF3E5F5),
                             borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFF4A1587).withValues(alpha: 0.3)),
                           ),
-                          child: Row(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF4A1587),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Text('\$', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white, height: 1)),
+                              const Row(
+                                children: [
+                                  Icon(Icons.star_rounded, color: Color(0xFFFFD700), size: 24),
+                                  SizedBox(width: 8),
+                                  Expanded(child: Text('¡Tienes una Yapa!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF4A1587)))),
+                                ],
                               ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('¡Boom!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF1A1A1A))),
-                                    const SizedBox(height: 4),
-                                    Text('Tienes ${_availableYapas.length} yapas disponibles', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF3B1066))),
-                                    const SizedBox(height: 2),
-                                    const Text('Aplica tu descuento antes de pagar', style: TextStyle(fontSize: 14, color: Color(0xFF4D4D4D))),
-                                  ],
+                              const SizedBox(height: 12),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: Colors.grey.shade300, width: 1.5),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    isExpanded: true,
+                                    value: _selectedYapaId,
+                                    icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF4A1587)),
+                                    style: const TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.w700),
+                                    items: [
+                                      DropdownMenuItem<String>(
+                                        value: 'NINGUNA',
+                                        child: Text('No usar yapa', style: TextStyle(color: Colors.red.shade500, fontWeight: FontWeight.bold)),
+                                      ),
+                                      ..._availableYapas.map((ActiveYapa y) {
+                                        return DropdownMenuItem<String>(
+                                          value: y.id,
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const Text('Yapa de descuento', style: TextStyle(color: Color(0xFF4A1587), fontWeight: FontWeight.bold)),
+                                              Text('-\$${y.value.toStringAsFixed(2)}', style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.w900)),
+                                            ],
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ],
+                                    onChanged: (String? newValue) {
+                                      if (newValue != null) {
+                                        setState(() {
+                                          _selectedYapaId = newValue;
+                                        });
+                                      }
+                                    },
+                                  ),
                                 ),
                               ),
                             ],
@@ -262,73 +291,7 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
                     
                     const SizedBox(height: 24),
 
-                    // --- Dropdown Yapa ---
-                    if (!_isLoading && _availableYapas.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF3E5F5),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0xFF4A1587).withValues(alpha: 0.3)),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Row(
-                                children: [
-                                  Icon(Icons.star_rounded, color: Color(0xFFFFD700), size: 24),
-                                  SizedBox(width: 8),
-                                  Expanded(child: Text('¡Utiliza tu Yapa!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF4A1587)))),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(color: Colors.grey.shade300, width: 1.5),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    isExpanded: true,
-                                    value: _selectedYapaId,
-                                    icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF4A1587)),
-                                    style: const TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.w700),
-                                    items: [
-                                      DropdownMenuItem<String>(
-                                        value: 'NINGUNA',
-                                        child: Text('No usar yapa', style: TextStyle(color: Colors.red.shade500, fontWeight: FontWeight.bold)),
-                                      ),
-                                      ..._availableYapas.map((ActiveYapa y) {
-                                        return DropdownMenuItem<String>(
-                                          value: y.id,
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              const Text('Yapa de descuento', style: TextStyle(color: Color(0xFF4A1587), fontWeight: FontWeight.bold)),
-                                              Text('-\$${y.value.toStringAsFixed(2)}', style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.w900)),
-                                            ],
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ],
-                                    onChanged: (String? newValue) {
-                                      if (newValue != null) {
-                                        setState(() {
-                                          _selectedYapaId = newValue;
-                                        });
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+
                     
                     const SizedBox(height: 40), // Padding extra abajo para scroll libre
                   ],

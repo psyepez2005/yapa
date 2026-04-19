@@ -288,6 +288,11 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
                   ),
                 )
                 .then((_) => setState(() => _navIndex = 0));
+          } else if (index == 3) {
+            // Logout para comercio
+            TokenStorage.clearAll().then((_) {
+              context.go('/');
+            });
           } else {
             setState(() {
               _navIndex = index;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yapa/core/storage/token_storage.dart';
 import '../screens/mapa_yapas_screen.dart';
 
 class MockupBottomNav extends StatelessWidget {
@@ -43,16 +44,10 @@ class MockupBottomNav extends StatelessWidget {
               );
               break;
             case 3:
-              // Perfil decorativo
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Próximamente disponible'),
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: const Color(0xFF4A1587),
-                  duration: const Duration(seconds: 1),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              );
+              // Logout
+              TokenStorage.clearAll().then((_) {
+                context.go('/');
+              });
               break;
           }
         },
