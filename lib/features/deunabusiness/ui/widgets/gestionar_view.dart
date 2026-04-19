@@ -8,6 +8,7 @@ class GestionarView extends StatelessWidget {
   final Future<void> Function() onRefresh;
   final VoidCallback onTopUp;
   final VoidCallback onCreateCoupon;
+  final VoidCallback onNavigateToYapa;
 
   const GestionarView({
     super.key,
@@ -17,6 +18,7 @@ class GestionarView extends StatelessWidget {
     required this.onRefresh,
     required this.onTopUp,
     required this.onCreateCoupon,
+    required this.onNavigateToYapa,
   });
 
   @override
@@ -146,121 +148,57 @@ class GestionarView extends StatelessWidget {
               ),
               const SizedBox(height: 32),
 
-              // Trazabilidad de Yapa
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFDF7FF),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Row(
+              // ── Card-preview de Yapa (lleva a la pantalla completa) ──
+              GestureDetector(
+                onTap: onNavigateToYapa,
+                child: Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF4A1587), Color(0xFF7B1FA2)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Text('🎁', style: TextStyle(fontSize: 22)),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('🎁', style: TextStyle(fontSize: 18)),
-                            SizedBox(width: 8),
-                            Text(
+                            const Text(
                               'Trazabilidad de Yapa',
                               style: TextStyle(
+                                color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF4A1587),
-                                fontSize: 16,
+                                fontSize: 15,
                               ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              loadingStats
+                                  ? 'Cargando...'
+                                  : '\$${(stats?.yapaInvestmentTotal ?? 0).toStringAsFixed(2)} invertidos · ${stats?.returningCustomersThisMonth ?? 0} vecinos',
+                              style: const TextStyle(color: Colors.white70, fontSize: 12),
                             ),
                           ],
                         ),
-                        if (loadingStats)
-                          const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4A1587)))
-                        else
-                          const Text('Este mes', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('Inversión del negocio', style: TextStyle(color: Colors.grey, fontSize: 11)),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '\$${(stats?.yapaInvestmentTotal ?? 0).toStringAsFixed(2)}',
-                                  style: const TextStyle(color: Color(0xFF4A1587), fontSize: 22, fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${((stats?.yapaCashbackRate ?? 0.02) * 100).toInt()}% por cliente',
-                                  style: const TextStyle(color: Colors.grey, fontSize: 9),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('Vecinos que volvieron', style: TextStyle(color: Colors.grey, fontSize: 11)),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '${stats?.returningCustomersThisMonth ?? 0}',
-                                  style: const TextStyle(color: Color(0xFF0A9E8F), fontSize: 22, fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'de ${stats?.totalCustomers ?? 0} clientes',
-                                  style: const TextStyle(color: Color(0xFF0A9E8F), fontSize: 9),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // Cupones activos
-              if (coupons.isNotEmpty) ...[
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Mis Yapas configuradas', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    TextButton.icon(
-                      onPressed: onCreateCoupon,
-                      icon: const Icon(Icons.add, color: Color(0xFF4A1587), size: 18),
-                      label: const Text('Nueva', style: TextStyle(color: Color(0xFF4A1587))),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                ...coupons.map((c) => _buildCouponTile(c)),
-              ] else ...[
-                const SizedBox(height: 24),
-                OutlinedButton.icon(
-                  onPressed: onCreateCoupon,
-                  icon: const Icon(Icons.add, color: Color(0xFF4A1587)),
-                  label: const Text('Crear nueva Yapa', style: TextStyle(color: Color(0xFF4A1587))),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF4A1587)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    minimumSize: const Size(double.infinity, 48),
+                      ),
+                      const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+                    ],
                   ),
                 ),
-              ],
+              ),
 
               const SizedBox(height: 32),
               // Novedades Deuna Negocios
@@ -308,52 +246,6 @@ class GestionarView extends StatelessWidget {
               Text(value, style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.bold)),
               Text(label, style: const TextStyle(color: Colors.grey, fontSize: 10)),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCouponTile(MerchantCoupon coupon) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: coupon.isActive ? const Color(0xFFE0F7FA) : Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Text('🎁', style: TextStyle(fontSize: 20, color: coupon.isActive ? null : Colors.grey)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '\$${coupon.discountValue.toStringAsFixed(2)} de descuento',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: coupon.isActive ? const Color(0xFF00897B) : Colors.grey,
-                  ),
-                ),
-                Text(
-                  'Nivel requerido: ${coupon.tierRequired}',
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: coupon.isActive ? const Color(0xFF00BFA5) : Colors.grey.shade400,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              coupon.isActive ? 'Activo' : 'Inactivo',
-              style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-            ),
           ),
         ],
       ),
