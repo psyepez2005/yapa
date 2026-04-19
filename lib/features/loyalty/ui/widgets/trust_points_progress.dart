@@ -12,9 +12,7 @@ class TrustPointsProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Cálculo seguro del progreso (evitar división por cero)
     final double progress = targetPoints > 0 ? (currentPoints / targetPoints) : 0.0;
-    // Aseguramos que la barra no sobrepase el 100% visualmente
     final double safeProgress = progress > 1.0 ? 1.0 : progress;
 
     return Container(
@@ -29,12 +27,12 @@ class TrustPointsProgress extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
             blurRadius: 15,
-            offset: const Offset(0, -5), // Sombra hacia arriba para destacar en el fondo
+            offset: const Offset(0, -5),
           )
         ],
       ),
       child: SafeArea(
-        top: false, // Solo respeta el safe area inferior (para los gestos de iOS/Android)
+        top: false, 
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,8 +40,9 @@ class TrustPointsProgress extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: const [
+                // ✅ TEXTO ACLARATORIO
                 Text(
-                  'Meta para recompensa',
+                  'Progreso para tu próxima Yapa',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
                 ),
                 Icon(Icons.card_giftcard, color: Color(0xFF00BFA5), size: 20),
@@ -52,10 +51,9 @@ class TrustPointsProgress extends StatelessWidget {
             const SizedBox(height: 16),
             Row(
               children: [
-                // Texto de puntos (Ej: 50 / 500)
                 RichText(
                   text: TextSpan(
-                    style: const TextStyle(fontSize: 16, fontFamily: 'Roboto'), // Fuente por defecto
+                    style: const TextStyle(fontSize: 16, fontFamily: 'Roboto'),
                     children: [
                       TextSpan(
                         text: '$currentPoints ',
@@ -69,14 +67,13 @@ class TrustPointsProgress extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                // Barra de progreso alineada a la derecha
                 Expanded(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: LinearProgressIndicator(
                       value: safeProgress,
                       backgroundColor: Colors.grey.shade200,
-                      color: const Color(0xFF00BFA5), // Turquesa DeUna
+                      color: const Color(0xFF4A1587), // Usamos morado para diferenciar puntos de las Yapas (turquesa)
                       minHeight: 12,
                     ),
                   ),

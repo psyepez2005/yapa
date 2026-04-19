@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:yapa/core/models/loyalty_profile.dart';
 import 'package:yapa/core/services/loyalty_service.dart';
 import 'package:intl/intl.dart';
@@ -94,6 +95,42 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                     tierName: widget.tierName,
                     cashbackPercentage: widget.cashbackPercentage,
                   ),
+                  if (widget.activeYapas.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                      child: InkWell(
+                        onTap: () {
+                          context.pushNamed('business_yapas', extra: {
+                            'name': widget.businessName,
+                            'yapas': widget.activeYapas.length,
+                          });
+                        },
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4A1587), // Fondo Morado
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.card_giftcard, color: Colors.white, size: 20),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'Tienes ${widget.activeYapas.length} Yapas disponibles',
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                              const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 14),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   if (widget.activeYapas.isNotEmpty) _buildActiveYapasSection(),
                   _buildTransactionsSection(),
                 ],

@@ -68,6 +68,31 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
                       entries: _entries,
                     ),
             ),
+            if (!_isLoading)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => context.pushNamed('my_yapas', extra: _entries),
+                      icon: const Icon(Icons.stars_rounded, color: Colors.white),
+                      label: const Text(
+                        'Ver mis Yapas disponibles', 
+                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4A1587),
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
