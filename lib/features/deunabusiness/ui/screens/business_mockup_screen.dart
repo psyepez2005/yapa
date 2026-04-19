@@ -250,6 +250,7 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
                       Navigator.pop(ctx);
                       try {
                         final coupon = await MerchantService().createCoupon(
+                          name: 'Generado desde Mockup',
                           value: value,
                           minimumPurchase: minPurchase,
                           code: code,

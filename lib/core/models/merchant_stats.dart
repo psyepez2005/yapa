@@ -1,22 +1,32 @@
 class MerchantCoupon {
   final String id;
+  final String name;
   final double discountValue;
   final String tierRequired;
   final bool isActive;
 
   const MerchantCoupon({
     required this.id,
+    required this.name,
     required this.discountValue,
     required this.tierRequired,
     required this.isActive,
   });
 
   factory MerchantCoupon.fromJson(Map<String, dynamic> json) => MerchantCoupon(
-        id: json['id'] as String,
-        discountValue: (json['discountValue'] as num).toDouble(),
+        id: (json['id'] ?? json['_id'] ?? 'yapa_${DateTime.now().millisecondsSinceEpoch}').toString(),
+        name: (json['name'] as String?) ?? (json['code'] as String?) ?? 'Yapa Especial',
+        discountValue: _parseDouble(json['discountValue'] ?? json['value']),
         tierRequired: (json['tierRequired'] as String?) ?? 'Bronce',
         isActive: (json['isActive'] as bool?) ?? true,
       );
+
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
+  }
 }
 
 class MerchantStats {

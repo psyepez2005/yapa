@@ -48,6 +48,7 @@ class MerchantService {
   }
 
   Future<MerchantCoupon> createCoupon({
+    required String name,
     required double value,
     required double minimumPurchase,
     required String code,
@@ -56,6 +57,7 @@ class MerchantService {
     try {
       final dio = await ApiClient.merchantAuthorized();
       final response = await dio.post('/merchants/me/coupons', data: {
+        'name': name,
         'value': value,
         'minimumPurchase': minimumPurchase,
         'code': code,
@@ -66,6 +68,17 @@ class MerchantService {
       return MerchantCoupon.fromJson(data);
     } on DioException catch (e) {
       throw MerchantException(_extractMessage(e));
+    }
+  }
+
+  Future<void> deleteCoupon(String id) async {
+    try {
+      final dio = await ApiClient.merchantAuthorized();
+      await dio.delete('/merchants/me/coupons/$id');
+    } on DioException catch (e) {
+      if (e.response?.statusCode != 404) {
+        throw MerchantException(_extractMessage(e));
+      }
     }
   }
 

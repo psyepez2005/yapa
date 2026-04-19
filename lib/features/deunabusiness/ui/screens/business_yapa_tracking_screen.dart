@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:yapa/core/models/merchant_stats.dart';
 import 'package:yapa/core/services/merchant_service.dart';
+import 'create_yapa_screen.dart';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -90,8 +91,14 @@ class _BusinessYapaTrackingScreenState
         });
         _animCtrl.forward();
       }
-    } catch (_) {
-      if (mounted) _animCtrl.forward();
+    } catch (e) {
+      debugPrint('Error en _load: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al cargar datos: $e'), backgroundColor: Colors.red),
+        );
+        _animCtrl.forward();
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -238,12 +245,347 @@ class _BusinessYapaTrackingScreenState
                           ),
                         ],
                       ),
+                      const SizedBox(height: 28),
+
+                      // ── 5. Mis Yapas creadas ─────────────────────────
+                      _sectionTitle('Mis Yapas creadas'),
+                      const SizedBox(height: 14),
+                      if (_coupons.isEmpty)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: const Column(
+                            children: [
+                              Icon(Icons.card_giftcard, size: 40, color: Colors.grey),
+                              SizedBox(height: 12),
+                              Text(
+                                'A\u00fan no has creado yapas',
+                                style: TextStyle(color: Colors.grey, fontSize: 14),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Crea tu primera yapa para fidelizar clientes',
+                                style: TextStyle(color: Colors.grey, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        ...List.generate(_coupons.length, (i) {
+                          final coupon = _coupons[i];
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: coupon.isActive
+                                    ? const Color(0xFF4A1587).withValues(alpha: 0.2)
+                                    : Colors.grey.shade200,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.03),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                // Icono
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: coupon.isActive
+                                        ? const Color(0xFFF3E5F5)
+                                        : Colors.grey.shade100,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    Icons.card_giftcard,
+                                    color: coupon.isActive
+                                        ? const Color(0xFF4A1587)
+                                        : Colors.grey,
+                                    size: 22,
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                // Info
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        coupon.name,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: coupon.isActive
+                                              ? const Color(0xFF333333)
+                                              : Colors.grey,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'Valor: \$${coupon.discountValue.toStringAsFixed(2)}',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: coupon.isActive
+                                                  ? const Color(0xFF4A1587)
+                                                  : Colors.grey,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: coupon.isActive
+                                                  ? const Color(0xFFE8F5E9)
+                                                  : Colors.grey.shade100,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              coupon.isActive
+                                                  ? 'Activa'
+                                                  : 'Inactiva',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: coupon.isActive
+                                                    ? const Color(0xFF0A9E8F)
+                                                    : Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Nivel: ${coupon.tierRequired}',
+                                        style: const TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Actions
+                                IconButton(
+                                  icon: const Icon(Icons.edit_outlined,
+                                      color: Color(0xFF4A1587), size: 20),
+                                  tooltip: 'Editar',
+                                  onPressed: () => _showEditCouponSheet(coupon),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline,
+                                      color: Colors.red, size: 20),
+                                  tooltip: 'Eliminar',
+                                  onPressed: () => _confirmDeleteCoupon(coupon),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+
+                      const SizedBox(height: 20),
+
+                      // ── 6. Bot\u00f3n Crear una Yapa ───────────────────────
+                      SizedBox(
+                        width: double.infinity,
+                        height: 58,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF4A1587),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            elevation: 6,
+                            shadowColor:
+                                const Color(0xFF4A1587).withOpacity(0.35),
+                          ),
+                          icon: const Icon(Icons.add_circle_outline,
+                              color: Colors.white, size: 24),
+                          label: const Text(
+                            'Crear una Yapa',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onPressed: () async {
+                            final created = await Navigator.of(context).push<bool>(
+                              MaterialPageRoute(
+                                builder: (_) => const CreateYapaScreen(),
+                              ),
+                            );
+                            if (created == true) _load();
+                          },
+                        ),
+                      ),
                       const SizedBox(height: 16),
                     ],
                   ),
                 ),
               ),
             ),
+    );
+  }
+
+  void _showEditCouponSheet(MerchantCoupon coupon) {
+    final valueCtrl = TextEditingController(
+        text: coupon.discountValue.toStringAsFixed(2));
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(ctx).viewInsets.bottom,
+          left: 24, right: 24, top: 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Editar Yapa',
+                style: TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            Text('ID: ${coupon.id.substring(0, coupon.id.length.clamp(0, 8))}...',
+                style: const TextStyle(color: Colors.grey, fontSize: 12)),
+            const SizedBox(height: 20),
+            TextField(
+              controller: valueCtrl,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: 'Valor del descuento',
+                prefixText: '\$ ',
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                      color: Color(0xFF4A1587), width: 2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF4A1587),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
+                ),
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Yapa actualizada'),
+                      backgroundColor: Color(0xFF0A9E8F),
+                    ),
+                  );
+                  _load();
+                },
+                child: const Text('Guardar cambios',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold)),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _confirmDeleteCoupon(MerchantCoupon coupon) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded,
+                color: Colors.red, size: 28),
+            SizedBox(width: 10),
+            Text('Eliminar Yapa',
+                style: TextStyle(fontSize: 18)),
+          ],
+        ),
+        content: Text(
+          'Se eliminar\u00e1 la yapa de \$${coupon.discountValue.toStringAsFixed(2)}.\n\u00bfEst\u00e1s seguro?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar',
+                style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                // Show loading
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Eliminando yapas...')),
+                );
+                await MerchantService().deleteCoupon(coupon.id);
+                setState(() => _coupons.removeWhere((c) => c.id == coupon.id));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Yapa eliminada'),
+                    backgroundColor: Color(0xFF0A9E8F),
+                  ),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error al eliminar: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text('Eliminar',
+                style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 
