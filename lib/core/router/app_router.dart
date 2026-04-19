@@ -7,8 +7,15 @@ import 'package:yapa/features/deunabusiness/ui/screens/business_mockup_screen.da
 import 'package:yapa/features/loyalty/ui/screens/my_yapas_screen.dart';
 import 'package:yapa/features/loyalty/ui/screens/qr_scanner_screen.dart';
 import '../../features/deunamockup/ui/screens/mockup_home_screen.dart';
+import '../../features/deunamockup/ui/screens/mockup_qr_scanner_screen.dart';
+import '../../features/deunamockup/ui/screens/mockup_payment_amount_screen.dart';
+import '../../features/deunamockup/ui/screens/mockup_payment_confirmation_screen.dart';
+import '../../features/deunamockup/ui/screens/mockup_payment_receipt_screen.dart';
 import '../../features/loyalty/ui/screens/loyalty_dashboard_screen.dart';
 import '../../features/loyalty/ui/screens/business_detail_screen.dart';
+
+// ✅ 1. AGREGAR ESTA IMPORTACIÓN (Asegúrate de que el archivo exista en tus carpetas)
+import '../../features/loyalty/ui/screens/my_yapas_screen.dart'; 
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -57,6 +64,28 @@ class AppRouter {
                   ?.cast<LoyaltyProfileEntry>() ??
               const [];
           return MyYapasScreen(entries: entries);
+        },
+      ),
+      GoRoute(
+        path: '/payment-amount',
+        name: 'payment_amount',
+        builder: (context, state) => const MockupPaymentAmountScreen(),
+      ),
+      GoRoute(
+        path: '/payment-confirmation/:amount',
+        name: 'payment_confirmation',
+        builder: (context, state) {
+          final amount = state.pathParameters['amount'] ?? '0.00';
+          return MockupPaymentConfirmationScreen(amount: amount);
+        },
+      ),
+      GoRoute(
+        path: '/payment-receipt/:amount/:yapa',
+        name: 'payment_receipt',
+        builder: (context, state) {
+          final amount = state.pathParameters['amount'] ?? '0.00';
+          final yapa = state.pathParameters['yapa'] ?? 'NINGUNA';
+          return MockupPaymentReceiptScreen(amount: amount, usedYapa: yapa);
         },
       ),
       GoRoute(
