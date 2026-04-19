@@ -13,9 +13,8 @@ import '../../features/deunamockup/ui/screens/mockup_payment_confirmation_screen
 import '../../features/deunamockup/ui/screens/mockup_payment_receipt_screen.dart';
 import '../../features/loyalty/ui/screens/loyalty_dashboard_screen.dart';
 import '../../features/loyalty/ui/screens/business_detail_screen.dart';
-import '../../features/loyalty/ui/screens/my_yapas_screen.dart'; 
-// ✅ NUEVA IMPORTACIÓN
-import '../../features/loyalty/ui/screens/business_yapas_screen.dart'; 
+import '../../features/loyalty/ui/screens/my_yapas_screen.dart';
+import '../../features/loyalty/ui/screens/business_yapas_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(

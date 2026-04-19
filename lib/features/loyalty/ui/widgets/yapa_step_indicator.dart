@@ -15,19 +15,18 @@ class YapaStepIndicator extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List.generate(totalSteps, (index) {
-        // Si el índice es menor que las yapas actuales, está "completado"
         bool isCompleted = index < currentSteps;
-        
+
         return Expanded(
           child: Container(
-            height: 12, // Altura del círculo/cápsula
+            height: 12,
             margin: EdgeInsets.only(
-              right: index == totalSteps - 1 ? 0 : 8, // Espacio entre círculos
+              right: index == totalSteps - 1 ? 0 : 8,
             ),
             decoration: BoxDecoration(
-              color: isCompleted 
-                  ? const Color(0xFF00BFA5) // Turquesa si está ganada
-                  : Colors.grey.shade200,    // Gris si falta
+              color: isCompleted
+                  ? const Color(0xFF00BFA5)
+                  : Colors.grey.shade200,
               borderRadius: BorderRadius.circular(10),
             ),
           ),

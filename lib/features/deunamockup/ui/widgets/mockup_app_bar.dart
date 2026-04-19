@@ -28,7 +28,7 @@ class _MockupAppBarState extends State<MockupAppBar> {
     final parts = fullName.split(' ');
     String first = parts.isNotEmpty ? parts[0] : 'Usuario';
     String initials = '';
-    
+
     if (parts.length >= 2) {
       initials = '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     } else if (first.length >= 2) {

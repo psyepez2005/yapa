@@ -109,7 +109,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF4A1587), // Fondo Morado
+                            color: const Color(0xFF4A1587),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Row(
@@ -288,7 +288,6 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                   Divider(color: Colors.grey.shade200, height: 1),
               itemBuilder: (_, i) {
                 final tx = _transactions[i];
-                // Formatear fecha
                 final dt = DateTime.parse(tx['date'] as String);
                 final formattedDate =
                     DateFormat("dd MMM yyyy, HH:mm", "es_ES").format(dt);

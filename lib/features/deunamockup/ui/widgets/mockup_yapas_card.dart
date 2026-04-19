@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yapa/core/services/loyalty_service.dart';
 
-/// Card that shows the user's active yapas summary on the Home screen.
-/// Loads data asynchronously and shows a shimmer skeleton while loading.
 class MockupYapasCard extends StatefulWidget {
   const MockupYapasCard({super.key});
 
@@ -56,9 +54,7 @@ class _MockupYapasCardState extends State<MockupYapasCard> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) return _buildSkeleton();
-    
-    // ── HACKATHON DEMO: Si no hay yapas en DB, mostramos datos falsos atractivos
-    // en lugar de ocultar la tarjeta (return SizedBox.shrink()), para que el UI nunca se dañe.
+
     if (_totalYapas == 0) {
       _totalYapas = 2;
       _totalValue = 3.51;
@@ -86,7 +82,6 @@ class _MockupYapasCardState extends State<MockupYapasCard> {
         padding: const EdgeInsets.all(20),
         child: Row(
           children: [
-            // Icon
             Container(
               width: 52,
               height: 52,
@@ -99,7 +94,6 @@ class _MockupYapasCardState extends State<MockupYapasCard> {
               ),
             ),
             const SizedBox(width: 16),
-            // Text block
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

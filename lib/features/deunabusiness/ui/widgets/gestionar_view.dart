@@ -80,15 +80,12 @@ class _GestionarViewState extends State<GestionarView> {
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Resumen de ingresos (con color) ─────────────────
                   _GmvCard(gmv: gmv, totalTx: s?.totalTransactions ?? 0),
                   const SizedBox(height: 16),
 
-                  // ── Saldo ─────────────────────────────────────────────
                   _BalanceCard(balance: balance, onTopUp: widget.onTopUp),
                   const SizedBox(height: 20),
 
-                  // ── Clientes ──────────────────────────────────────────
                   if (total > 0) ...[
                     _ClientsSummary(
                       total: total,
@@ -100,13 +97,11 @@ class _GestionarViewState extends State<GestionarView> {
                     const SizedBox(height: 20),
                   ],
 
-                  // ── Alerta principal ──────────────────────────────────
                   if (_mainAlert(activeCoupons, balance, widget.loyaltyEnabled) != null) ...[
                     _mainAlert(activeCoupons, balance, widget.loyaltyEnabled)!,
                     const SizedBox(height: 20),
                   ],
 
-                  // ── Acciones ──────────────────────────────────────────
                   _ActionsRow(
                     onTopUp: widget.onTopUp,
                     onYapa: widget.onCreateCoupon,
@@ -114,7 +109,6 @@ class _GestionarViewState extends State<GestionarView> {
                   ),
                   const SizedBox(height: 20),
 
-                  // ── Programa de lealtad ───────────────────────────────
                   _LoyaltyRow(
                     enabled: widget.loyaltyEnabled,
                     toggling: widget.togglingLoyalty,
@@ -122,7 +116,6 @@ class _GestionarViewState extends State<GestionarView> {
                   ),
                   const SizedBox(height: 20),
 
-                  // ── Últimos cobros ────────────────────────────────────
                   if (_recentTx.isNotEmpty) ...[
                     const Text('Últimos cobros',
                         style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black45, letterSpacing: 0.3)),
@@ -156,7 +149,6 @@ class _GestionarViewState extends State<GestionarView> {
   }
 }
 
-// ── GMV Card (con gradiente) ──────────────────────────────────────────────────
 class _GmvCard extends StatelessWidget {
   final double gmv;
   final int totalTx;
@@ -200,7 +192,6 @@ class _GmvCard extends StatelessWidget {
   }
 }
 
-// ── Balance Card ──────────────────────────────────────────────────────────────
 class _BalanceCard extends StatefulWidget {
   final double balance;
   final VoidCallback onTopUp;
@@ -263,7 +254,6 @@ class _BalanceCardState extends State<_BalanceCard> {
   }
 }
 
-// ── Clients Summary ───────────────────────────────────────────────────────────
 class _ClientsSummary extends StatelessWidget {
   final int total, retPct, bronce, plata, oro;
   const _ClientsSummary({required this.total, required this.retPct,
@@ -329,7 +319,6 @@ class _ClientsSummary extends StatelessWidget {
   );
 }
 
-// ── Alert ─────────────────────────────────────────────────────────────────────
 class _Alert extends StatelessWidget {
   final String title, subtitle, actionLabel;
   final VoidCallback onTap;
@@ -361,7 +350,6 @@ class _Alert extends StatelessWidget {
   }
 }
 
-// ── Actions Row ───────────────────────────────────────────────────────────────
 class _ActionsRow extends StatelessWidget {
   final VoidCallback onTopUp, onYapa, onMisYapas;
   const _ActionsRow({required this.onTopUp, required this.onYapa, required this.onMisYapas});
@@ -409,7 +397,6 @@ class _ActionBtn extends StatelessWidget {
   }
 }
 
-// ── Loyalty Row ───────────────────────────────────────────────────────────────
 class _LoyaltyRow extends StatelessWidget {
   final bool enabled, toggling;
   final ValueChanged<bool> onToggle;
@@ -439,7 +426,6 @@ class _LoyaltyRow extends StatelessWidget {
   }
 }
 
-// ── Recent Transactions ───────────────────────────────────────────────────────
 class _RecentTxList extends StatelessWidget {
   final List<Map<String, dynamic>> transactions;
   const _RecentTxList({required this.transactions});
@@ -490,7 +476,6 @@ class _RecentTxList extends StatelessWidget {
   }
 }
 
-// ── Skeleton ──────────────────────────────────────────────────────────────────
 class _Skeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

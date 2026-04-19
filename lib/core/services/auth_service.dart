@@ -11,7 +11,6 @@ class AuthException implements Exception {
 }
 
 class AuthService {
-  // ── Usuario ──────────────────────────────────────────────────────────────
 
   Future<void> loginUser(String phone, String password) async {
     try {
@@ -22,7 +21,7 @@ class AuthService {
       final data = response.data['data'] as Map<String, dynamic>;
       final token = data['accessToken'] as String;
       final fullName = data['fullName'] as String?;
-      
+
       await Future.wait([
         TokenStorage.saveUserToken(token),
         if (fullName != null) TokenStorage.saveUserName(fullName),
@@ -54,8 +53,6 @@ class AuthService {
       throw AuthException(_extractMessage(e));
     }
   }
-
-  // ── Comerciante ───────────────────────────────────────────────────────────
 
   Future<void> loginMerchant(String email, String password) async {
     try {
@@ -98,8 +95,6 @@ class AuthService {
     }
   }
 
-  // ── Categorías (para el formulario de registro de comerciante) ────────────
-
   Future<List<Map<String, dynamic>>> fetchCategories() async {
     try {
       final response = await ApiClient.public.get('/merchants/categories');
@@ -109,8 +104,6 @@ class AuthService {
       throw AuthException(_extractMessage(e));
     }
   }
-
-  // ── Helpers ───────────────────────────────────────────────────────────────
 
   String _extractMessage(DioException e) {
     final data = e.response?.data;

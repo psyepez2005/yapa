@@ -21,7 +21,6 @@ class _MerchantLoginScreenState extends State<MerchantLoginScreen> {
   bool _isRegisterMode = false;
   bool _obscurePassword = true;
 
-  // Register extras
   List<Map<String, dynamic>> _categories = [];
   String? _selectedCategoryId;
   bool _loadingCategories = false;

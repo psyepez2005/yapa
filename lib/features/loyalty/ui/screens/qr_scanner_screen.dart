@@ -41,7 +41,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       return;
     }
     final amountStr = uri.queryParameters['amount'];
-    
+
     const mockMerchantNames = {
       'm001': 'Ceviches de la Ruleta',
       '66952548-3805-41ff-b4fd-607572313c34': 'Ceviches de la Ruleta',
@@ -53,8 +53,8 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       'f899d880-0f70-4fed-bd2a-2f75de599ef1': 'Tienda Escolar El Saber',
     };
     final nameParam = uri.queryParameters['name'];
-    final merchantName = (nameParam != null && nameParam.isNotEmpty) 
-        ? nameParam 
+    final merchantName = (nameParam != null && nameParam.isNotEmpty)
+        ? nameParam
         : (mockMerchantNames[merchantId] ?? 'Negocio');
 
     setState(() => _scanned = true);

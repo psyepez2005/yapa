@@ -19,10 +19,8 @@ class DeUnaLoyaltyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'DeUna Fidelización - Hackathon',
-      debugShowCheckedModeBanner: false, // Escondemos la etiqueta de debug para la demo
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      
-      // Configuración de GoRouter
       routerConfig: AppRouter.router,
     );
   }

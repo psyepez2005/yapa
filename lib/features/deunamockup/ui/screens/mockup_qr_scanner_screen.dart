@@ -51,12 +51,11 @@ class _MockupQrScannerScreenState extends State<MockupQrScannerScreen> {
       'f899d880-0f70-4fed-bd2a-2f75de599ef1': 'Tienda Escolar El Saber',
     };
     final nameParam = uri.queryParameters['name'];
-    final merchantName = (nameParam != null && nameParam.isNotEmpty) 
-        ? nameParam 
+    final merchantName = (nameParam != null && nameParam.isNotEmpty)
+        ? nameParam
         : (mockMerchantNames[merchantId] ?? 'Negocio');
     final amountStr = uri.queryParameters['amount'];
 
-    // Si QR ya trae monto fijo → saltar pantalla de monto e ir directo a confirmación
     if (amountStr != null && amountStr.isNotEmpty) {
       final amount = double.tryParse(amountStr);
       if (amount != null && amount > 0) {
@@ -69,7 +68,6 @@ class _MockupQrScannerScreenState extends State<MockupQrScannerScreen> {
       }
     }
 
-    // Sin monto en QR → pantalla de ingreso de monto
     context.pushNamed('payment_amount', extra: {
       'merchantId': merchantId,
       'merchantName': merchantName,

@@ -68,11 +68,11 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
   Future<void> _processPayment(double finalAmount) async {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
-    
+
     try {
       final amountNum = double.tryParse(widget.amount.replaceAll(',', '.')) ?? 0;
       final yapaId = _selectedYapaId == 'NINGUNA' ? null : _selectedYapaId;
-      
+
       final result = await LoyaltyService().scanTransaction(
         widget.merchantId,
         amountNum,
@@ -102,7 +102,7 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
   @override
   Widget build(BuildContext context) {
     double originalAmount = double.tryParse(widget.amount.replaceAll(',', '.')) ?? 0.0;
-    
+
     ActiveYapa? selectedYapa;
     if (_selectedYapaId != 'NINGUNA') {
       try {
@@ -113,7 +113,6 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
     }
 
     double discountAmount = selectedYapa?.value ?? 0.0;
-    // Evitar saldo negativo
     double discountedAmount = originalAmount - discountAmount;
     if (discountedAmount < 0) discountedAmount = 0;
 
@@ -131,7 +130,7 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
         ),
         actions: [
           TextButton(
-            onPressed: () => context.go('/mockup'), // Cancelar payment flow
+            onPressed: () => context.go('/mockup'),
             child: const Text('Cancelar', style: TextStyle(color: Color(0xFF4A1587), fontWeight: FontWeight.bold, fontSize: 16)),
           ),
           const SizedBox(width: 8),
@@ -226,8 +225,7 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
                       ),
                     ),
                     const SizedBox(height: 8),
-                    
-                    // Block 1: Para
+
                     _buildListTile(
                       iconWidget: Text(
                         _realMerchantName.length >= 2
@@ -241,8 +239,7 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
                       subtitle: 'Banco Pichincha ******5424',
                     ),
                     const SizedBox(height: 24),
-                    
-                    // Block 2: Monto
+
                     _buildListTile(
                       iconWidget: const Text('\$', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 18)),
                       iconColor: const Color(0xFFF3F4F6),
@@ -251,8 +248,7 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
                       subtitle: null,
                     ),
                     const SizedBox(height: 24),
-                    
-                    // Block 3: Desde
+
                     _buildListTile(
                       iconWidget: const Text('d!', style: TextStyle(color: Color(0xFF00BFA5), fontStyle: FontStyle.italic, fontWeight: FontWeight.w900, fontSize: 20)),
                       iconColor: const Color(0xFF4A1587),
@@ -260,16 +256,15 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
                       title: 'Mi cuenta Deuna',
                       subtitle: '******8424',
                     ),
-                    
+
                     const SizedBox(height: 32),
-                    
-                    // Completaremos tu pago alert box
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEAF2F9), // Light blue from image
+                          color: const Color(0xFFEAF2F9),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -288,18 +283,15 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 24),
 
-
-                    
-                    const SizedBox(height: 40), // Padding extra abajo para scroll libre
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
             ),
-            
-            // Footer bottom bar (Total + Button)
+
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -317,7 +309,7 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
                         Row(
                           children: [
                             Text(
-                              '\$$displayOriginal', 
+                              '\$$displayOriginal',
                               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey, decoration: TextDecoration.lineThrough)
                             ),
                             Text('\$$displayDiscounted', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF00BFA5))),
@@ -338,7 +330,7 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         elevation: 0,
                       ),
-                      child: _isProcessing 
+                      child: _isProcessing
                         ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
                         : const Text('Pagar', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                     ),

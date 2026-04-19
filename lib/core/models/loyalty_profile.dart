@@ -81,8 +81,6 @@ class LoyaltyProfileEntry {
     return days != null && days <= 7 && days >= 0;
   }
 
-  // ── Tier helpers ──────────────────────────────────────────────────────────
-
   String get tierName {
     switch (tierLevel) {
       case 1:
@@ -147,8 +145,6 @@ class LoyaltyProfileEntry {
         return const Color(0xFFFBE9E7);
     }
   }
-
-  // ── Progress helpers ──────────────────────────────────────────────────────
 
   double get progressValue {
     if (pointsToNextCoupon == null) return 1.0;

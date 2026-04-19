@@ -64,7 +64,6 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
         });
       }
     } catch (_) {
-      // Stats are informational — silently fall back to cached/empty
     } finally {
       if (mounted) setState(() => _loadingStats = false);
     }
@@ -231,7 +230,6 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
                         onModeChanged: (newMode) {
                           setState(() {
                             _cobrarMode = newMode;
-                            // En modo Manual el QR aparece de inmediato
                             if (newMode == CobrarMode.manual) {
                               _showQR = true;
                             }
@@ -280,7 +278,6 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
         onTap: (index) {
           if (index == 2) {
-            // Tab Yapa → navega a la pantalla de Trazabilidad
             Navigator.of(context)
                 .push(
                   MaterialPageRoute(
@@ -289,7 +286,6 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
                 )
                 .then((_) => setState(() => _navIndex = 0));
           } else if (index == 3) {
-            // Logout para comercio
             TokenStorage.clearAll().then((_) {
               context.go('/');
             });

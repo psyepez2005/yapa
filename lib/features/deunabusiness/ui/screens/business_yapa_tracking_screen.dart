@@ -5,19 +5,12 @@ import 'package:yapa/core/services/merchant_service.dart';
 import 'campaign_impact_screen.dart';
 import 'create_yapa_screen.dart';
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Modelo local para los puntos del gráfico de confianza
-// ─────────────────────────────────────────────────────────────────────────────
 class _TrustPoint {
   final String month;
-  final double value; // 0-100
+  final double value;
   const _TrustPoint(this.month, this.value);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Widget principal
-// ─────────────────────────────────────────────────────────────────────────────
 class BusinessYapaTrackingScreen extends StatefulWidget {
   const BusinessYapaTrackingScreen({super.key});
 
@@ -35,7 +28,6 @@ class _BusinessYapaTrackingScreenState
   late AnimationController _animCtrl;
   late Animation<double> _anim;
 
-  // Datos derivados para los gráficos
   late List<_TrustPoint> _trustPoints;
 
   @override
@@ -131,7 +123,6 @@ class _BusinessYapaTrackingScreenState
     try {
       await MerchantService().publishCoupon(coupon.id);
       if (!mounted) return;
-      // Navegar a la Vista de Impacto de Campaña
       await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => CampaignImpactScreen(
@@ -230,7 +221,6 @@ class _BusinessYapaTrackingScreenState
                   builder: (_, __) => Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ── 1. Clientes por rango ────────────────────────
                       _sectionTitle('Clientes por rango'),
                       const SizedBox(height: 14),
                       _TierRangeCard(
@@ -240,7 +230,6 @@ class _BusinessYapaTrackingScreenState
                       ),
                       const SizedBox(height: 28),
 
-                      // ── 2. Gráfico nivel de confianza ────────────────
                       _sectionTitle('Nivel de confianza de clientes'),
                       const SizedBox(height: 14),
                       _TrustChartCard(
@@ -249,7 +238,6 @@ class _BusinessYapaTrackingScreenState
                       ),
                       const SizedBox(height: 28),
 
-                      // ── 3 + 4. Yapas usadas + Nuevos clientes ────────
                       Row(
                         children: [
                           Expanded(
@@ -276,7 +264,6 @@ class _BusinessYapaTrackingScreenState
                       ),
                       const SizedBox(height: 28),
 
-                      // ── 5. Mis Yapas creadas ─────────────────────────
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -362,7 +349,6 @@ class _BusinessYapaTrackingScreenState
                             ),
                             child: Row(
                               children: [
-                                // Icono
                                 Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
@@ -380,7 +366,6 @@ class _BusinessYapaTrackingScreenState
                                   ),
                                 ),
                                 const SizedBox(width: 14),
-                                // Info
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,7 +431,6 @@ class _BusinessYapaTrackingScreenState
                                     ],
                                   ),
                                 ),
-                                // Actions
                                 if (coupon.isActive)
                                   IconButton(
                                     icon: const Icon(Icons.send_outlined,
@@ -467,7 +451,6 @@ class _BusinessYapaTrackingScreenState
 
                       const SizedBox(height: 20),
 
-                      // ── 6. Bot\u00f3n Crear una Yapa ───────────────────────
                       SizedBox(
                         width: double.infinity,
                         height: 56,
@@ -549,7 +532,6 @@ class _BusinessYapaTrackingScreenState
             onPressed: () async {
               Navigator.pop(ctx);
               try {
-                // Show loading
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Eliminando yapas...')),
                 );
@@ -588,9 +570,6 @@ class _BusinessYapaTrackingScreenState
       );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Badge: contador de yapas activas
-// ─────────────────────────────────────────────────────────────────────────────
 class _CouponLimitBadge extends StatelessWidget {
   final int current;
   final int max;
@@ -625,9 +604,6 @@ class _CouponLimitBadge extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Card: Clientes por rango (Bronce / Plata / Oro)
-// ─────────────────────────────────────────────────────────────────────────────
 class _TierRangeCard extends StatelessWidget {
   final Map<String, int> tiers;
   final int total;
@@ -664,7 +640,6 @@ class _TierRangeCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Barra apilada
           if (total > 0) ...[
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
@@ -684,7 +659,6 @@ class _TierRangeCard extends StatelessWidget {
             ),
             const SizedBox(height: 20),
           ],
-          // Leyenda con cada tier
           ...tierDefs.map((t) => _TierRow(
                 def: t,
                 total: total,
@@ -773,9 +747,6 @@ class _TierRow extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Card: Gráfico de nivel de confianza (línea custom)
-// ─────────────────────────────────────────────────────────────────────────────
 class _TrustChartCard extends StatelessWidget {
   final List<_TrustPoint> points;
   final double progress;
@@ -858,7 +829,6 @@ class _TrustChartCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          // Etiquetas del eje X
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: points
@@ -889,7 +859,6 @@ class _LinePainter extends CustomPainter {
     if (points.isEmpty) return;
 
     final n = points.length;
-    // Calcula cuántos puntos trazar según el progreso
     final drawUpTo = (progress * (n - 1)).clamp(0.0, (n - 1).toDouble());
     final fullPoints = drawUpTo.floor();
     final frac = drawUpTo - fullPoints;
@@ -900,7 +869,6 @@ class _LinePainter extends CustomPainter {
       return Offset(x, y);
     }
 
-    // Relleno (gradiente)
     if (fullPoints >= 1) {
       final fillPath = Path();
       fillPath.moveTo(0, size.height);
@@ -959,7 +927,6 @@ class _LinePainter extends CustomPainter {
       );
     }
 
-    // Línea
     final linePaint = Paint()
       ..color = const Color(0xFF4A1587)
       ..strokeWidth = 3
@@ -978,7 +945,6 @@ class _LinePainter extends CustomPainter {
           ctrl1.dx, ctrl1.dy, ctrl2.dx, ctrl2.dy, p1.dx, p1.dy);
     }
 
-    // Segmento parcial del siguiente punto
     if (fullPoints < n - 1 && frac > 0) {
       final p0 = getOffset(fullPoints);
       final p1 = getOffset(fullPoints + 1);
@@ -991,7 +957,6 @@ class _LinePainter extends CustomPainter {
 
     canvas.drawPath(linePath, linePaint);
 
-    // Puntos circulares en cada valor
     final dotPaint = Paint()
       ..color = const Color(0xFF4A1587)
       ..style = PaintingStyle.fill;
@@ -1012,9 +977,6 @@ class _LinePainter extends CustomPainter {
       old.progress != progress || old.points != points;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Card: Estadística grande (Yapas usadas / Nuevos clientes)
-// ─────────────────────────────────────────────────────────────────────────────
 class _BigStatCard extends StatelessWidget {
   final IconData icon;
   final String label;

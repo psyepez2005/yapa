@@ -41,7 +41,7 @@ class TransactionListItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '-\$${amount.toStringAsFixed(2)}', 
+                '-\$${amount.toStringAsFixed(2)}',
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black)
               ),
               const SizedBox(height: 4),
@@ -50,7 +50,7 @@ class TransactionListItem extends StatelessWidget {
                   const Icon(Icons.stars_rounded, color: Color(0xFF00BFA5), size: 14),
                   const SizedBox(width: 4),
                   Text(
-                    '+$points pts confianza', 
+                    '+$points pts confianza',
                     style: const TextStyle(color: Color(0xFF00BFA5), fontSize: 12, fontWeight: FontWeight.bold)
                   ),
                 ],

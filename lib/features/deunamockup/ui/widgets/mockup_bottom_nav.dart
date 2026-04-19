@@ -38,13 +38,11 @@ class MockupBottomNav extends StatelessWidget {
               if (currentIndex != 1) context.go('/loyalty');
               break;
             case 2:
-              // Radar Screen
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const MapaYapasScreen()),
               );
               break;
             case 3:
-              // Logout
               TokenStorage.clearAll().then((_) {
                 context.go('/');
               });

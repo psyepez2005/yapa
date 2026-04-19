@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:yapa/core/models/merchant_stats.dart';
 import 'package:yapa/core/services/merchant_service.dart';
 
-/// Pantalla de "Vista de Impacto de Campaña" — se muestra tras publicar una Yapa.
 class CampaignImpactScreen extends StatefulWidget {
   final MerchantCoupon coupon;
   final MerchantStats? stats;
@@ -34,7 +33,6 @@ class _CampaignImpactScreenState extends State<CampaignImpactScreen>
     _slide = Tween<Offset>(begin: const Offset(0, 0.04), end: Offset.zero)
         .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
 
-    // Si ya vienen stats, las usamos. Si no, las cargamos.
     if (widget.stats != null) {
       _stats = widget.stats;
       _loading = false;
@@ -58,19 +56,13 @@ class _CampaignImpactScreenState extends State<CampaignImpactScreen>
   @override
   void dispose() { _ctrl.dispose(); super.dispose(); }
 
-  // ── Métricas calculadas ───────────────────────────────────────────────────
-
   bool get _isNewMerchant => (_stats?.totalCustomers ?? 0) == 0;
 
-  // Clientes alcanzados: real si hay histórico, estimado si es nuevo
   int get _clientesAlcanzados {
     if (!_isNewMerchant) return _stats!.totalCustomers;
-    // Estimado: los primeros clientes que visiten el negocio verán la Yapa.
-    // Usamos la cantidad de cupones como alcance potencial mínimo garantizado.
     return widget.coupon.quantity;
   }
 
-  // Canjes proyectados con fallback inteligente
   int get _canjesProyectados {
     if (!_isNewMerchant) {
       final s = _stats!;
@@ -78,20 +70,17 @@ class _CampaignImpactScreenState extends State<CampaignImpactScreen>
       final low = s.tierDistribution.tier1.toDouble();
       return ((highValue * 0.4) + (low * 0.15)).round().clamp(1, widget.coupon.quantity);
     }
-    // Para merchants nuevos: estimamos que el 60% de los cupones será canjeado
     return (widget.coupon.quantity * 0.6).ceil().clamp(1, widget.coupon.quantity);
   }
 
   double get _costoEstimado => widget.coupon.discountValue * widget.coupon.quantity;
 
-  // GMV adicional proyectado
   double get _gmvAdicional {
     final s = _stats;
     final double avgTicket;
     if (s != null && s.totalTransactions > 0) {
       avgTicket = s.totalRevenue / s.totalTransactions;
     } else {
-      // Benchmark: el ticket generado por la Yapa suele ser 3-4x el valor del descuento
       avgTicket = widget.coupon.discountValue * 3.5;
     }
     return _canjesProyectados * avgTicket;
@@ -102,7 +91,6 @@ class _CampaignImpactScreenState extends State<CampaignImpactScreen>
     return ((_gmvAdicional - _costoEstimado) / _costoEstimado * 100).clamp(0, 9999);
   }
 
-  // Etiqueta de contexto según si hay datos reales o son proyecciones
   String get _alcanceLabel => _isNewMerchant
       ? 'Cupones disponibles'
       : 'Clientes notificados';
@@ -137,11 +125,9 @@ class _CampaignImpactScreenState extends State<CampaignImpactScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ── Banner de éxito ───────────────────────────────
                       _SuccessBanner(coupon: widget.coupon),
                       const SizedBox(height: 24),
 
-                      // ── Métricas principales ──────────────────────────
                       _sectionLabel('Alcance estimado'),
                       const SizedBox(height: 12),
                       Row(children: [
@@ -163,11 +149,9 @@ class _CampaignImpactScreenState extends State<CampaignImpactScreen>
                       ]),
                       const SizedBox(height: 24),
 
-                      // ── ROI destacado ─────────────────────────────────
                       _RoiCard(roi: _roi, gmv: _gmvAdicional, costo: _costoEstimado),
                       const SizedBox(height: 24),
 
-                      // ── Distribución de clientes ──────────────────────
                       if (_stats != null && _stats!.totalCustomers > 0) ...[
                         _sectionLabel('¿A quiénes llega?'),
                         const SizedBox(height: 12),
@@ -175,7 +159,6 @@ class _CampaignImpactScreenState extends State<CampaignImpactScreen>
                         const SizedBox(height: 24),
                       ],
 
-                      // ── Disclaimer ────────────────────────────────────
                       Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
@@ -199,7 +182,6 @@ class _CampaignImpactScreenState extends State<CampaignImpactScreen>
                       ),
                       const SizedBox(height: 24),
 
-                      // ── Cerrar ────────────────────────────────────────
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -228,7 +210,6 @@ class _CampaignImpactScreenState extends State<CampaignImpactScreen>
   );
 }
 
-// ── Success Banner ────────────────────────────────────────────────────────────
 class _SuccessBanner extends StatelessWidget {
   final MerchantCoupon coupon;
   const _SuccessBanner({required this.coupon});
@@ -280,7 +261,6 @@ class _SuccessBanner extends StatelessWidget {
   }
 }
 
-// ── Metric Card ───────────────────────────────────────────────────────────────
 class _MetricCard extends StatelessWidget {
   final String value, label, sublabel;
   final IconData icon;
@@ -329,7 +309,6 @@ class _MetricCard extends StatelessWidget {
   }
 }
 
-// ── ROI Card ──────────────────────────────────────────────────────────────────
 class _RoiCard extends StatelessWidget {
   final double roi, gmv, costo;
   const _RoiCard({required this.roi, required this.gmv, required this.costo});
@@ -408,7 +387,6 @@ class _FinancialRow extends StatelessWidget {
   }
 }
 
-// ── Tier Breakdown ────────────────────────────────────────────────────────────
 class _TierBreakdown extends StatelessWidget {
   final MerchantStats stats;
   const _TierBreakdown({required this.stats});

@@ -45,7 +45,7 @@ class _MockupPaymentAmountScreenState extends State<MockupPaymentAmountScreen> {
         centerTitle: true,
         actions: [
           TextButton(
-            onPressed: () => context.go('/mockup'), // Salir
+            onPressed: () => context.go('/mockup'),
             child: const Text('Salir', style: TextStyle(color: Color(0xFF4A1587), fontWeight: FontWeight.bold, fontSize: 14)),
           ),
           const SizedBox(width: 8),
@@ -61,7 +61,6 @@ class _MockupPaymentAmountScreenState extends State<MockupPaymentAmountScreen> {
                   child: Column(
                     children: [
           const SizedBox(height: 24),
-          // Merchant Avatar & Name
           Container(
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(
@@ -79,15 +78,13 @@ class _MockupPaymentAmountScreenState extends State<MockupPaymentAmountScreen> {
           const Text('Pagando a', style: TextStyle(fontSize: 12, color: Colors.grey)),
           const SizedBox(height: 2),
           Text(widget.merchantName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black87)),
-          
+
           const SizedBox(height: 40),
-          
-          // Amount
+
           Text(_amount.isEmpty ? '\$0' : '\$$_amount', style: const TextStyle(fontSize: 72, fontWeight: FontWeight.w500, color: Color(0xFF4A1587))),
-          
+
           const Spacer(),
-          
-          // Chips
+
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -103,14 +100,12 @@ class _MockupPaymentAmountScreenState extends State<MockupPaymentAmountScreen> {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 48),
-          
-          // Keypad
+
           _buildKeypad(),
-          
+
           const SizedBox(height: 16),
-          // Continuar Button
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: SizedBox(
@@ -200,7 +195,7 @@ class _MockupPaymentAmountScreenState extends State<MockupPaymentAmountScreen> {
                             style: const TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.w400,
-                              color: Color(0xFF4A1587), 
+                              color: Color(0xFF4A1587),
                             ),
                           ),
                   ),

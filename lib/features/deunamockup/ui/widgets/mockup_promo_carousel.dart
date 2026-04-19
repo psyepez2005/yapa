@@ -121,7 +121,6 @@ class _BroadcastCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Avatar del negocio
           Container(
             width: 100,
             decoration: BoxDecoration(
@@ -154,7 +153,6 @@ class _BroadcastCard extends StatelessWidget {
               ],
             ),
           ),
-          // Texto
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(12.0),
@@ -192,4 +190,4 @@ class _BroadcastCard extends StatelessWidget {
       ),
     );
   }
-}
+}

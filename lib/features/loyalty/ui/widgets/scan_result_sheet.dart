@@ -60,7 +60,6 @@ class _ScanResultSheetState extends State<ScanResultSheet>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Drag handle
           Container(
             width: 40,
             height: 4,
@@ -71,7 +70,6 @@ class _ScanResultSheetState extends State<ScanResultSheet>
           ),
           const SizedBox(height: 24),
 
-          // Main icon animated
           ScaleTransition(
             scale: _scaleAnim,
             child: FadeTransition(
@@ -81,7 +79,6 @@ class _ScanResultSheetState extends State<ScanResultSheet>
           ),
           const SizedBox(height: 16),
 
-          // Title
           FadeTransition(
             opacity: _fadeAnim,
             child: Text(
@@ -101,7 +98,6 @@ class _ScanResultSheetState extends State<ScanResultSheet>
           ),
           const SizedBox(height: 24),
 
-          // Stats row
           if (!isBlocked) ...[
             _StatsRow(
               points: r.trustPointsEarned,
@@ -112,19 +108,16 @@ class _ScanResultSheetState extends State<ScanResultSheet>
             const SizedBox(height: 16),
           ],
 
-          // New Yapa celebration
           if (hasNewYapa) ...[
             _YapaCelebrationCard(coupon: r.couponUnlocked!),
             const SizedBox(height: 16),
           ],
 
-          // Antifraud warning
           if (isBlocked) ...[
             _AntifraudWarning(),
             const SizedBox(height: 16),
           ],
 
-          // Points to next coupon
           if (!isBlocked && r.pointsToNextCoupon != null && r.pointsToNextCoupon! > 0)
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
@@ -138,7 +131,6 @@ class _ScanResultSheetState extends State<ScanResultSheet>
               ),
             ),
 
-          // CTA
           SizedBox(
             width: double.infinity,
             height: 52,

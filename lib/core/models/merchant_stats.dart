@@ -33,9 +33,9 @@ class MerchantCoupon {
 }
 
 class TierDistribution {
-  final int tier1; // LOW  — Bronce
-  final int tier2; // MEDIUM — Plata
-  final int tier3; // HIGH   — Oro
+  final int tier1;
+  final int tier2;
+  final int tier3;
 
   const TierDistribution({this.tier1 = 0, this.tier2 = 0, this.tier3 = 0});
 
@@ -60,7 +60,6 @@ class MerchantStats {
   final double totalRevenue;
   final bool loyaltyEnabled;
 
-  // Derived helpers kept for backward compat with existing widgets
   int get totalCustomers => tierDistribution.total;
   int get returningCustomers => tierDistribution.tier2 + tierDistribution.tier3;
   int get newCustomersThisMonth => tierDistribution.tier1;

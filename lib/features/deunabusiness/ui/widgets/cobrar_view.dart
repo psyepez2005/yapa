@@ -48,7 +48,6 @@ class CobrarView extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Toggle QR / Manual
             Container(
               height: 46,
               padding: const EdgeInsets.all(3),
@@ -129,7 +128,6 @@ class CobrarView extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Navigation row
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
@@ -150,11 +148,9 @@ class CobrarView extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Keypad
             CobrarKeypad(onKeyTap: onKeyTap),
 
             const SizedBox(height: 40),
-            // Button
             SizedBox(
               width: double.infinity,
               height: 54,

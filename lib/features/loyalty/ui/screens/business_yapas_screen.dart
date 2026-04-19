@@ -33,7 +33,7 @@ class BusinessYapasScreen extends StatelessWidget {
           ? _buildEmptyState()
           : ListView.builder(
               padding: const EdgeInsets.all(24),
-              itemCount: availableYapas, // Máximo 5, según la base de datos
+              itemCount: availableYapas,
               itemBuilder: (context, index) {
                 return _buildYapaCoupon(index + 1);
               },
@@ -76,11 +76,10 @@ class BusinessYapasScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Lado Izquierdo (Icono)
           Container(
             padding: const EdgeInsets.all(24),
             decoration: const BoxDecoration(
-              color: Color(0xFFE0F2F1), // Turquesa clarito
+              color: Color(0xFFE0F2F1),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(14),
                 bottomLeft: Radius.circular(14),
@@ -88,7 +87,6 @@ class BusinessYapasScreen extends StatelessWidget {
             ),
             child: const Icon(Icons.card_giftcard, color: Color(0xFF00BFA5), size: 32),
           ),
-          // Lado Derecho (Detalles)
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

@@ -8,24 +8,18 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   static Future<void> initialize() async {
-    // Para Android
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    // Config global
     const InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
     );
 
-    // Inicializar el plugin
-    // Se obvia el chequeo en web si no usamos web custom notifications, 
-    // local notifications tiene fallback basico.
     if (!kIsWeb) {
       await _notificationsPlugin.initialize(
         initializationSettings,
       );
-      
-      // Pedir permisos en Android 13+
+
       await _notificationsPlugin
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>()
@@ -39,9 +33,6 @@ class NotificationService {
     required String body,
   }) async {
     if (kIsWeb) {
-      // En Web, evitamos crasher el plugin de local_notifications si no está full adaptado 
-      // y sencillamente imprimimos en consola o usamos print (ya que el hackathon es en Chrome
-      // usaremos un fallback interno si el usuario usa chrome, aunque el plugin dberia correr).
       debugPrint('🔔 [PUSH NOTIFICATION WEB]: $title - $body');
       return;
     }

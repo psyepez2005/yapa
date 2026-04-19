@@ -8,7 +8,7 @@ class LoyaltyHeader extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       padding: const EdgeInsets.only(top: 50, left: 16, right: 16, bottom: 20),
       decoration: const BoxDecoration(
-        color: Color(0xFF4A1587), // Morado DeUna
+        color: Color(0xFF4A1587),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(30),
           bottomRight: Radius.circular(30),
@@ -30,7 +30,7 @@ class LoyaltyHeader extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 48), // Espacio para equilibrar el botón de atrás
+              const SizedBox(width: 48),
             ],
           ),
           const SizedBox(height: 10),

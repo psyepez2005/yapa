@@ -15,11 +15,9 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Generar formato de fechas simulado
     final now = DateTime.now();
     final dateStr = '${now.day} abr ${now.year} - ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-    
-    // Extraer datos del resultado real enviado por AWS
+
     final String txNumber = transactionResult?['transactionId']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString();
     final num trustPointsEarned = transactionResult?['trustPointsEarned'] as num? ?? 0;
     final Map<String, dynamic>? couponApplied = transactionResult?['couponApplied'];
@@ -27,11 +25,10 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
     final bool antifraudBlocked = transactionResult?['antifraudBlocked'] == true;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF3B1066), // Fondo morado oscuro
+      backgroundColor: const Color(0xFF3B1066),
       body: SafeArea(
         child: Stack(
           children: [
-            // Close button at top right
             Positioned(
               top: 16,
               right: 16,
@@ -47,8 +44,7 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
-            // Scrollable Receipt Card
+
             Padding(
               padding: const EdgeInsets.only(top: 60, left: 16, right: 16, bottom: 16),
               child: SingleChildScrollView(
@@ -63,10 +59,8 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                       child: Column(
                         children: [
                           const SizedBox(height: 32),
-                          // Logo
                           const Text('d!', style: TextStyle(color: Color(0xFF4A1587), fontStyle: FontStyle.italic, fontWeight: FontWeight.w900, fontSize: 40)),
                           const SizedBox(height: 16),
-                          // Título
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
                             child: Text(
@@ -81,14 +75,12 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                             style: TextStyle(color: Colors.grey, fontSize: 14),
                           ),
                           const SizedBox(height: 24),
-                          // Valor final cobrado
                           Text(
                             '\$$amount',
                             style: const TextStyle(color: Color(0xFF4A1587), fontSize: 48, fontWeight: FontWeight.w900),
                           ),
                           const SizedBox(height: 16),
-                          
-                          // --- YAPA APLICADA INJECTION ---
+
                           if (couponApplied != null)
                             Container(
                               margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
@@ -105,7 +97,7 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      '¡Descuento Yapa aplicado! (-\$${(couponApplied['discountAmount'] as num).toStringAsFixed(2)}) 🎁', 
+                                      '¡Descuento Yapa aplicado! (-\$${(couponApplied['discountAmount'] as num).toStringAsFixed(2)}) 🎁',
                                       style: TextStyle(color: Colors.green.shade800, fontWeight: FontWeight.bold, fontSize: 13),
                                     ),
                                   ),
@@ -121,8 +113,7 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                               ),
                             ),
                           const SizedBox(height: 24),
-                          
-                          // Transaction details
+
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
                             child: Row(
@@ -145,8 +136,7 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 32),
-                          
-                          // Earned Pts & Yapa unlocking integration
+
                           if (antifraudBlocked)
                             Container(
                               margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -173,7 +163,7 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                               margin: const EdgeInsets.symmetric(horizontal: 24),
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF3E5F5), // Light purple
+                                color: const Color(0xFFF3E5F5),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Column(
@@ -222,8 +212,7 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                             ),
 
                           const SizedBox(height: 32),
-                          
-                          // QR Code Mockup (Placeholder elegante)
+
                           Container(
                             height: 180,
                             width: 180,
@@ -254,23 +243,20 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                               Text('Código de verificación', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600, fontSize: 13)),
                             ],
                           ),
-                          
+
                           const SizedBox(height: 24),
-                          // Divider line
                           Container(
                             height: 1,
                             margin: const EdgeInsets.symmetric(horizontal: 16),
                             color: Colors.grey.shade300,
                           ),
                           const SizedBox(height: 24),
-                          
-                          // De / Para section
+
                           _buildTransferParty(title: 'De', initials: 'TÚ', name: 'Tu Cuenta Deuna', subtext: 'Banco Pichincha ******6971', avatarColor: const Color(0xFFEAD8F7)),
                           const SizedBox(height: 16),
                           _buildTransferParty(title: 'Para', initials: merchantName.length >= 2 ? merchantName.substring(0, 2).toUpperCase() : merchantName.toUpperCase(), name: merchantName, subtext: 'Cobro por escáner de pagos', avatarColor: const Color(0xFFEAD8F7)),
-                          
+
                           const SizedBox(height: 24),
-                          // Buttons
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
                             child: SizedBox(
@@ -308,7 +294,6 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Volver a pagar text outside the card
                     InkWell(
                       onTap: () => context.pop(),
                       child: const Row(

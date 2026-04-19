@@ -4,8 +4,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:yapa/core/network/api_client.dart';
 import 'dart:async';
 
-/// Mapa de Yapas interactivo (simulación para Hackathon).
-/// Utiliza OpenStreetMap (sin API key) y permite simular una caminata hacia una Yapa.
 class MapaYapasScreen extends StatefulWidget {
   const MapaYapasScreen({super.key});
 
@@ -15,12 +13,10 @@ class MapaYapasScreen extends StatefulWidget {
 
 class _MapaYapasScreenState extends State<MapaYapasScreen> with TickerProviderStateMixin {
   final MapController _mapCtrl = MapController();
-  
-  // Lista de Yapas traídas del backend
+
   List<Map<String, dynamic>> _broadcasts = [];
   bool _isLoading = true;
 
-  // Ubicación del usuario (Centro Norte Quito / La Carolina)
   LatLng _userPosition = const LatLng(-0.17300, -78.48200);
   bool _isSimulating = false;
   Timer? _simulationTimer;
@@ -87,7 +83,6 @@ class _MapaYapasScreenState extends State<MapaYapasScreen> with TickerProviderSt
   }
 
   LatLng _getLocationForYapa(Map<String, dynamic> yapa, int index) {
-    // Si el backend viene con coordenadas reales (y no son cero)
     if (yapa.containsKey('latitude') && yapa.containsKey('longitude')) {
       final lat = double.tryParse(yapa['latitude'].toString()) ?? 0.0;
       final lng = double.tryParse(yapa['longitude'].toString()) ?? 0.0;
@@ -95,7 +90,6 @@ class _MapaYapasScreenState extends State<MapaYapasScreen> with TickerProviderSt
         return LatLng(lat, lng);
       }
     }
-    // Fallback pseudoaleatorio en un radio corto por si aca
     const double offset = 0.005;
     return LatLng(
       _userPosition.latitude + (index % 2 == 0 ? offset : -offset) * (index * 0.5),
@@ -103,16 +97,14 @@ class _MapaYapasScreenState extends State<MapaYapasScreen> with TickerProviderSt
     );
   }
 
-  // Activa la caminata simulada
   void _startSimulation() {
     if (_broadcasts.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No hay Yapas activas para simular.')));
       return;
     }
-    
+
     setState(() => _isSimulating = true);
 
-    // Elegimos la primera yapa como destino
     final targetYapa = _broadcasts.first;
     final targetPos = _getLocationForYapa(targetYapa, 0);
 
@@ -127,17 +119,15 @@ class _MapaYapasScreenState extends State<MapaYapasScreen> with TickerProviderSt
         timer.cancel();
         return;
       }
-      
+
       setState(() {
         _userPosition = LatLng(_userPosition.latitude + latDiff, _userPosition.longitude + lngDiff);
         _mapCtrl.move(_userPosition, 16.5);
       });
 
-      // Calcular distancia (usamos Distance de latlong2)
       const Distance distance = Distance();
       final double distanceInMeters = distance.as(LengthUnit.Meter, _userPosition, targetPos);
 
-      // Si llego a un radio de 50 metros, lanzamos notificación
       if (distanceInMeters <= 50 && _nearbyYapaDetected == null) {
         _nearbyYapaDetected = targetYapa;
         timer.cancel();
@@ -156,7 +146,7 @@ class _MapaYapasScreenState extends State<MapaYapasScreen> with TickerProviderSt
   void _showYapaPopup(Map<String, dynamic> yapa) {
     final name = yapa['merchantName'] ?? 'Comercio';
     final cp = yapa['couponValue']?.toString() ?? 'Especial';
-    
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -194,7 +184,7 @@ class _MapaYapasScreenState extends State<MapaYapasScreen> with TickerProviderSt
               TextButton(
                 onPressed: () {
                   Navigator.pop(ctx);
-                  _nearbyYapaDetected = null; // reset
+                  _nearbyYapaDetected = null;
                 },
                 child: const Text('Ignorar', style: TextStyle(color: Colors.grey)),
               )
@@ -243,7 +233,6 @@ class _MapaYapasScreenState extends State<MapaYapasScreen> with TickerProviderSt
                 ),
                 MarkerLayer(
                   markers: [
-                    // Usuario
                     Marker(
                       point: _userPosition,
                       width: 60,
@@ -267,7 +256,6 @@ class _MapaYapasScreenState extends State<MapaYapasScreen> with TickerProviderSt
                         ],
                       ),
                     ),
-                    // Yapas
                     ..._broadcasts.asMap().entries.map((e) {
                       final i = e.key;
                       final yapa = e.value;
@@ -302,10 +290,8 @@ class _MapaYapasScreenState extends State<MapaYapasScreen> with TickerProviderSt
                 ),
               ],
             ),
-      // Botón flotante extra por si quieren simular
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Centrar mapa
           _mapCtrl.move(_userPosition, 15.5);
         },
         backgroundColor: Colors.white,

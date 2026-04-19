@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yapa/core/services/merchant_service.dart';
 
-/// Pantalla ultra-simple para que un microcomerciante cree una Yapa (cupón)
-/// en un solo paso visual, sin tecnicismos.
 class CreateYapaScreen extends StatefulWidget {
   const CreateYapaScreen({super.key});
 
@@ -178,7 +176,6 @@ class _CreateYapaScreenState extends State<CreateYapaScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Nombre
             _SectionCard(
               icon: Icons.edit_outlined,
               title: '\u00BFC\u00F3mo se llama tu Yapa?',
@@ -205,7 +202,6 @@ class _CreateYapaScreenState extends State<CreateYapaScreen> {
 
             const SizedBox(height: 14),
 
-            // Valor
             _SectionCard(
               icon: Icons.local_offer_outlined,
               title: '\u00BFCu\u00E1nto le das de yapa?',
@@ -223,7 +219,6 @@ class _CreateYapaScreenState extends State<CreateYapaScreen> {
 
             const SizedBox(height: 14),
 
-            // Compra m\u00EDnima
             _SectionCard(
               icon: Icons.shopping_cart_outlined,
               title: '\u00BFCompra m\u00EDnima para aplicar?',
@@ -241,7 +236,6 @@ class _CreateYapaScreenState extends State<CreateYapaScreen> {
 
             const SizedBox(height: 14),
 
-            // Cantidad
             _SectionCard(
               icon: Icons.format_list_numbered,
               title: '¿Cuántos cupones emites?',
@@ -259,7 +253,6 @@ class _CreateYapaScreenState extends State<CreateYapaScreen> {
 
             const SizedBox(height: 14),
 
-            // Audiencia
             _SectionCard(
               icon: Icons.people_outline,
               title: '\u00BFA qui\u00E9n va dirigida?',
@@ -271,7 +264,6 @@ class _CreateYapaScreenState extends State<CreateYapaScreen> {
 
             const SizedBox(height: 24),
 
-            // Resumen + Bot\u00F3n
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),

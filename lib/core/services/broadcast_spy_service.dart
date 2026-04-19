@@ -8,13 +8,10 @@ class BroadcastSpyService {
   static int _lastKnownBroadcastCount = -1;
   static bool _isRunning = false;
 
-  /// Inicia el polling silencioso en segundo plano.
-  /// Llama esto al iniciar la app (en main.dart o MockupHomeScreen).
   static void startSpying() {
     if (_isRunning) return;
     _isRunning = true;
 
-    // Inicializar cuenta base sin notificar para evitar notis fantasma en primer login
     _fetchBroadcasts(isInitial: true);
 
     _spyTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
@@ -31,11 +28,11 @@ class BroadcastSpyService {
   static Future<void> _fetchBroadcasts({bool isInitial = false}) async {
     try {
       final dio = await ApiClient.userAuthorized();
-      if (dio == null) return; // Not authorized yet
-      
+      if (dio == null) return;
+
       final response = await dio.get('/loyalty/broadcasts');
       final List data = response.data['data'] as List;
-      
+
       final currentCount = data.length;
 
       if (isInitial) {
@@ -44,9 +41,7 @@ class BroadcastSpyService {
       }
 
       if (_lastKnownBroadcastCount != -1 && currentCount > _lastKnownBroadcastCount) {
-        // Encontramos una nueva campaña!
-        // Asume que la campaña mas reciente es el ultimo (o primer) elemento, busquemos el mas nuevo.
-        final newest = data.last; // normalmente se anaden al final, o data.first dependiendo del orden
+        final newest = data.last;
         final merchantName = newest['merchantName'] ?? 'Un negocio cercano';
         final rawMessage = newest['message'] ?? '';
         final valor = newest['couponValue']?.toString() ?? '?';
@@ -63,7 +58,6 @@ class BroadcastSpyService {
           body = 'Lanzaron una nueva Yapa de \$$valor. ¡Abre tu Radar y encuéntrala!';
         }
 
-        // Disparar Notificación Nativa Push Local
         await NotificationService.showNotification(
           id: currentCount,
           title: title,

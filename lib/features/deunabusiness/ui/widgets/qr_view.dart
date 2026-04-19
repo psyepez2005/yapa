@@ -7,7 +7,6 @@ class QRView extends StatelessWidget {
   final String? merchantId;
   final String? merchantName;
   final VoidCallback onContinue;
-  /// Label for the bottom action button (changes with cobrar mode)
   final String continueLabel;
 
   const QRView({
@@ -71,7 +70,6 @@ class QRView extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
         child: Column(
           children: [
-            // Instrucción clara para el comerciante
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
@@ -105,7 +103,6 @@ class QRView extends StatelessWidget {
                     fontSize: 56, fontWeight: FontWeight.w700)),
             const SizedBox(height: 20),
 
-            // QR Generator View
             Container(
               width: 250,
               height: 250,
@@ -157,7 +154,6 @@ class QRView extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Actions Row (Compartir + Verificar — sin card de Yapa Activa)
             Row(
               children: [
                 Expanded(
@@ -190,7 +186,6 @@ class QRView extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Bottom Continue
             SizedBox(
               width: double.infinity,
               height: 54,

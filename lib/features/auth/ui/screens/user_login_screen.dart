@@ -45,9 +45,9 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
       } else {
         String formattedPhone = _phoneCtrl.text.trim();
         if (!formattedPhone.startsWith('+')) {
-          formattedPhone = '+$formattedPhone'; // Auto-añade + si el usaurio no lo puso (para match de la BD)
+          formattedPhone = '+$formattedPhone';
         }
-        
+
         await _authService.loginUser(
           formattedPhone,
           _passwordCtrl.text,

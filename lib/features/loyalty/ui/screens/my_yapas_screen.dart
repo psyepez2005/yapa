@@ -19,7 +19,6 @@ class _MyYapasScreenState extends State<MyYapasScreen> {
   void initState() {
     super.initState();
     _entries = widget.entries;
-    // Si llegamos sin datos (navegación directa), los cargamos del back
     if (_entries.isEmpty) _loadFromBackend();
   }
 
@@ -29,7 +28,6 @@ class _MyYapasScreenState extends State<MyYapasScreen> {
       final data = await LoyaltyService().fetchProfile();
       if (mounted) setState(() => _entries = data);
     } catch (_) {
-      // silently fail — empty state is shown
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -179,7 +177,6 @@ class _MyYapasScreenState extends State<MyYapasScreen> {
   }
 }
 
-
 class _MerchantYapaGroup extends StatelessWidget {
   final LoyaltyProfileEntry entry;
 
@@ -204,7 +201,6 @@ class _MerchantYapaGroup extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header del comerciante
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -264,7 +260,6 @@ class _MerchantYapaGroup extends StatelessWidget {
             ),
           ),
           Divider(color: Colors.grey.shade100, height: 1),
-          // Lista de yapas
           ...entry.activeYapas.map((yapa) => _YapaItem(yapa: yapa)),
         ],
       ),

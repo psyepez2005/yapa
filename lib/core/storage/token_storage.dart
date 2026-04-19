@@ -1,7 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-/// Abstracción de almacenamiento que usa flutter_secure_storage.
-/// Soporta Android, iOS, Windows, y Web.
 class TokenStorage {
   static const _secureStorage = FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
@@ -13,21 +11,15 @@ class TokenStorage {
   static const _merchantTokenKey = 'merchant_access_token';
   static const _merchantIdKey = 'merchant_id';
 
-  // ── Escritura ──────────────────────────────────────────────────────────────
-
   static Future<void> saveUserToken(String token) => _write(_userTokenKey, token);
   static Future<void> saveUserName(String name) => _write(_userNameKey, name);
   static Future<void> saveMerchantToken(String token) => _write(_merchantTokenKey, token);
   static Future<void> saveMerchantId(String id) => _write(_merchantIdKey, id);
 
-  // ── Lectura ───────────────────────────────────────────────────────────────
-
   static Future<String?> getUserToken() => _read(_userTokenKey);
   static Future<String?> getUserName() => _read(_userNameKey);
   static Future<String?> getMerchantToken() => _read(_merchantTokenKey);
   static Future<String?> getMerchantId() => _read(_merchantIdKey);
-
-  // ── Eliminación ───────────────────────────────────────────────────────────
 
   static Future<void> clearUserToken() => _delete(_userTokenKey);
   static Future<void> clearMerchantToken() => _delete(_merchantTokenKey);
@@ -35,8 +27,6 @@ class TokenStorage {
   static Future<void> clearAll() async {
     await _secureStorage.deleteAll();
   }
-
-  // ── Helpers internos ──────────────────────────────────────────────────────
 
   static Future<void> _write(String key, String value) async {
     await _secureStorage.write(key: key, value: value);

@@ -14,33 +14,27 @@ class LoginScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
             child: Column(
               children: [
-              // Top Section
               Column(
                 children: [
                   const SizedBox(height: 40),
-                  // Logo deuna!
                   const Text(
                     'deuna!',
                     style: TextStyle(
-                      color: Color(0xFF4A1587), // Morado DeUna
+                      color: Color(0xFF4A1587),
                       fontSize: 32,
                       fontWeight: FontWeight.w900,
                       letterSpacing: -1,
                     ),
                   ),
                   const SizedBox(height: 30),
-                  // QR Area
                   Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Custom borders like a scanner
                       CustomPaint(
                         size: const Size(260, 260),
                         painter: _QRCornersPainter(),
                       ),
-                      // El QR falso
                       const Icon(Icons.qr_code_2, size: 220, color: Colors.black87),
-                      // El d! central
                       Container(
                         width: 60,
                         height: 60,
@@ -83,8 +77,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 40), // Espaciado seguro sin overflow
-              // Bottom Section
+              const SizedBox(height: 40),
               Column(
                 children: [
                   Row(
@@ -200,7 +193,6 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-// Pintor personalizado para dibujar las esquinas del recuadro del QR
 class _QRCornersPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -211,19 +203,15 @@ class _QRCornersPainter extends CustomPainter {
 
     const double length = 20.0;
 
-    // Arriba Izquierda
-    canvas.drawLine(const Offset(0, 0), const Offset(length, 0), paint); // Horizontal
-    canvas.drawLine(const Offset(0, 0), const Offset(0, length), paint); // Vertical
+    canvas.drawLine(const Offset(0, 0), const Offset(length, 0), paint);
+    canvas.drawLine(const Offset(0, 0), const Offset(0, length), paint);
 
-    // Arriba Derecha
     canvas.drawLine(Offset(size.width, 0), Offset(size.width - length, 0), paint);
     canvas.drawLine(Offset(size.width, 0), Offset(size.width, length), paint);
 
-    // Abajo Izquierda
     canvas.drawLine(Offset(0, size.height), Offset(length, size.height), paint);
     canvas.drawLine(Offset(0, size.height), Offset(0, size.height - length), paint);
 
-    // Abajo Derecha
     canvas.drawLine(Offset(size.width, size.height), Offset(size.width - length, size.height), paint);
     canvas.drawLine(Offset(size.width, size.height), Offset(size.width, size.height - length), paint);
   }

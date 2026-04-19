@@ -6,9 +6,9 @@ class LoyaltyBusinessCard extends StatefulWidget {
   final String businessName;
   final String category;
   final String location;
-  final String tierName; 
-  final String cashbackPercentage; 
-  final String minPurchaseAmount; 
+  final String tierName;
+  final String cashbackPercentage;
+  final String minPurchaseAmount;
   final int visits;
   final double progress;
   final String nextLevel;
@@ -45,8 +45,7 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
   @override
   Widget build(BuildContext context) {
     Color tierColor;
-    // La variable tierBgColor ya no se usa para el badge, pero la dejamos por si decides volver a usarla
-    Color tierBgColor; 
+    Color tierBgColor;
 
     switch (widget.tierName.toLowerCase()) {
       case 'oro':
@@ -135,7 +134,6 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                             widget.businessName,
                             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          // ✅ Solo mostramos la categoría (quitamos la ubicación)
                           Text(
                             widget.category,
                             style: const TextStyle(color: Colors.grey, fontSize: 13),
@@ -143,7 +141,6 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                         ],
                       ),
                     ),
-                    // ✅ Dejamos solo el contador de visitas
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
@@ -157,14 +154,14 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 16),
                 const Text(
                   'Yapas ganadas en este local',
                   style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                
+
                 YapaStepIndicator(
                   currentSteps: widget.currentYapas,
                   totalSteps: 5,
@@ -182,13 +179,12 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                
-                // ✅ Nueva fila minimalista bajo la barra de progreso
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      widget.tierName, // Solo dice "Bronce", "Plata", etc.
+                      widget.tierName,
                       style: TextStyle(
                         color: tierColor,
                         fontSize: 13,
@@ -196,7 +192,7 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                       ),
                     ),
                     Text(
-                      '${(widget.progress * 100).toInt()}%', // Solo el porcentaje
+                      '${(widget.progress * 100).toInt()}%',
                       style: const TextStyle(
                         color: Colors.grey,
                         fontSize: 13,
@@ -206,7 +202,6 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                   ],
                 ),
 
-                // Sección "Pasa la Yapa" (Se mantiene intacta)
                 if (_isExpanded) ...[
                   const SizedBox(height: 16),
                   Container(

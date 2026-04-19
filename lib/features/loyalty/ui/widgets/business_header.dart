@@ -16,7 +16,6 @@ class BusinessHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determinamos en qué paso está según la categoría (0 = Bronce, 1 = Plata, 2 = Oro)
     int currentStep = 0;
     final tier = tierName.toLowerCase();
     if (tier.contains('plata')) currentStep = 1;
@@ -61,17 +60,15 @@ class BusinessHeader extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 16),
-          
-          // ✅ EL NUEVO MENSAJE EDUCATIVO
+
           const Text(
             'Acumula puntos con cada consumo para reclamar Yapas y así ahorrar dinero en siguientes compras.',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.4),
           ),
-          
+
           const SizedBox(height: 24),
-          
-          // ✅ EL NUEVO PROGRESS BAR DE CATEGORÍAS (Timeline)
+
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -87,7 +84,6 @@ class BusinessHeader extends StatelessWidget {
     );
   }
 
-  // --- Widgets internos para dibujar el timeline ---
   Widget _buildTierBadge(String name, bool isActive) {
     return Column(
       children: [
@@ -120,7 +116,7 @@ class BusinessHeader extends StatelessWidget {
     return Container(
       width: 40,
       height: 3,
-      margin: const EdgeInsets.only(bottom: 20), // Para alinearlo con los círculos y no con el texto
+      margin: const EdgeInsets.only(bottom: 20),
       color: isActive ? const Color(0xFF00BFA5) : Colors.grey.shade200,
     );
   }

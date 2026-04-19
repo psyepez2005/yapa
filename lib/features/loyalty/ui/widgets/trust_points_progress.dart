@@ -32,7 +32,7 @@ class TrustPointsProgress extends StatelessWidget {
         ],
       ),
       child: SafeArea(
-        top: false, 
+        top: false,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,7 +40,6 @@ class TrustPointsProgress extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: const [
-                // ✅ TEXTO ACLARATORIO
                 Text(
                   'Progreso para tu próxima Yapa',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
@@ -73,7 +72,7 @@ class TrustPointsProgress extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: safeProgress,
                       backgroundColor: Colors.grey.shade200,
-                      color: const Color(0xFF4A1587), // Usamos morado para diferenciar puntos de las Yapas (turquesa)
+                      color: const Color(0xFF4A1587),
                       minHeight: 12,
                     ),
                   ),

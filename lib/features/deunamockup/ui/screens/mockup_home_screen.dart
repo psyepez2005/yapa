@@ -32,14 +32,12 @@ class MockupHomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      // Botón flotante QR
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         width: double.infinity,
         height: 56,
         child: FloatingActionButton.extended(
-          // ✅ ACÁ CONECTAMOS LA NAVEGACIÓN
           onPressed: () => context.pushNamed('mockup_scanner'),
           backgroundColor: const Color(0xFF4A1587),
           elevation: 2,
@@ -49,7 +47,6 @@ class MockupHomeScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: const MockupBottomNav(currentIndex: 0),
-      // bottomNavigationBar: const MockupBottomNav(), // Widget extraído
     );
   }
 }

@@ -52,7 +52,6 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
       final data = await _broadcastService.fetchBroadcasts();
       if (mounted) setState(() => _broadcasts = data);
     } catch (_) {
-      // broadcasts are informational — silently ignore errors
     }
   }
 
@@ -94,7 +93,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
                       onPressed: () => context.pushNamed('my_yapas', extra: _entries),
                       icon: const Icon(Icons.stars_rounded, color: Colors.white),
                       label: const Text(
-                        'Ver mis Yapas disponibles', 
+                        'Ver mis Yapas disponibles',
                         style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)
                       ),
                       style: ElevatedButton.styleFrom(
@@ -232,8 +231,6 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     );
   }
 
-  // ── Skeleton loading ──────────────────────────────────────────────────────
-
   Widget _buildGlobalSkeleton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -276,8 +273,6 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
       ),
     );
   }
-
-  // ── States ────────────────────────────────────────────────────────────────
 
   Widget _buildErrorState() {
     return Padding(
@@ -360,8 +355,6 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     );
   }
 }
-
-// ── Broadcasts section ────────────────────────────────────────────────────
 
 class _BroadcastsSection extends StatelessWidget {
   final List<MerchantBroadcast> broadcasts;
@@ -498,8 +491,6 @@ class _BroadcastCard extends StatelessWidget {
     );
   }
 }
-
-// ── Skeleton animation widget ─────────────────────────────────────────────
 
 class _SkeletonBox extends StatefulWidget {
   final double? width;
