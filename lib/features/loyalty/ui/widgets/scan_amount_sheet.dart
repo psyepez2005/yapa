@@ -6,11 +6,13 @@ import 'package:yapa/features/loyalty/ui/widgets/scan_result_sheet.dart';
 
 class ScanAmountSheet extends StatefulWidget {
   final String merchantId;
+  final String? prefillAmount;
   final VoidCallback onDone;
 
   const ScanAmountSheet({
     super.key,
     required this.merchantId,
+    this.prefillAmount,
     required this.onDone,
   });
 
@@ -29,6 +31,9 @@ class _ScanAmountSheetState extends State<ScanAmountSheet> {
   @override
   void initState() {
     super.initState();
+    if (widget.prefillAmount != null) {
+      _amount = widget.prefillAmount!;
+    }
     _loadYapas();
   }
 
@@ -132,6 +137,16 @@ class _ScanAmountSheetState extends State<ScanAmountSheet> {
             style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
           ),
           const SizedBox(height: 20),
+          if (widget.prefillAmount != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(color: Colors.orange.shade50, borderRadius: BorderRadius.circular(8)),
+              child: Text(
+                'Monto fijo solicitado por el negocio',
+                style: TextStyle(color: Colors.orange.shade800, fontSize: 12, fontWeight: FontWeight.bold),
+              ),
+            ),
           Text(
             _amount.isEmpty ? '\$ 0' : '\$$_amount',
             style: const TextStyle(
@@ -151,8 +166,11 @@ class _ScanAmountSheetState extends State<ScanAmountSheet> {
             ),
             const SizedBox(height: 16),
           ],
-          _buildKeypad(),
-          const SizedBox(height: 16),
+          if (widget.prefillAmount == null) ...[
+            _buildKeypad(),
+            const SizedBox(height: 16),
+          ] else
+            const SizedBox(height: 32),
           SizedBox(
             width: double.infinity,
             height: 52,

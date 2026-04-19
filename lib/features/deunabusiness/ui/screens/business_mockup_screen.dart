@@ -20,6 +20,8 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
   MerchantStats? _stats;
   List<MerchantCoupon> _coupons = [];
   bool _loadingStats = false;
+  bool _loyaltyEnabled = true;
+  bool _togglingLoyalty = false;
 
   @override
   void initState() {
@@ -42,15 +44,37 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
         service.fetchCoupons(),
       ]);
       if (mounted) {
+        final stats = results[0] as MerchantStats;
         setState(() {
-          _stats = results[0] as MerchantStats;
+          _stats = stats;
           _coupons = results[1] as List<MerchantCoupon>;
+          _loyaltyEnabled = stats.loyaltyEnabled;
         });
       }
     } catch (_) {
       // Stats are informational — silently fall back to cached/empty
     } finally {
       if (mounted) setState(() => _loadingStats = false);
+    }
+  }
+
+  Future<void> _toggleLoyalty(bool enabled) async {
+    if (_togglingLoyalty) return;
+    setState(() {
+      _togglingLoyalty = true;
+      _loyaltyEnabled = enabled;
+    });
+    try {
+      await MerchantService().toggleLoyalty(enabled: enabled);
+    } on MerchantException catch (e) {
+      if (mounted) {
+        setState(() => _loyaltyEnabled = !enabled);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _togglingLoyalty = false);
     }
   }
 
@@ -497,7 +521,7 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: QrImageView(
-                            data: 'deuna://merchant/$_merchantId',
+                            data: 'deuna://merchant/$_merchantId?name=${Uri.encodeComponent(_stats?.merchantName ?? '')}&amount=$_amount',
                             version: QrVersions.auto,
                             size: 250,
                             backgroundColor: Colors.white,
@@ -714,6 +738,49 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
                   ),
                 const SizedBox(height: 24),
               ],
+
+              // Loyalty toggle
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4A1587).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.loyalty, color: Color(0xFF4A1587), size: 20),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Programa de Yapas', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          Text(
+                            _loyaltyEnabled ? 'Activo · Clientes acumulan puntos' : 'Inactivo · Sin acumulación de puntos',
+                            style: TextStyle(color: Colors.grey.shade500, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _togglingLoyalty
+                        ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4A1587)))
+                        : Switch(
+                            value: _loyaltyEnabled,
+                            onChanged: _toggleLoyalty,
+                            activeColor: const Color(0xFF4A1587),
+                          ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
 
               // Accesos rapidos
               const Text('Accesos rápidos', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),

@@ -20,6 +20,7 @@ class MerchantCoupon {
 }
 
 class MerchantStats {
+  final String merchantName;
   final double balance;
   final int totalCustomers;
   final int returningCustomers;
@@ -29,8 +30,10 @@ class MerchantStats {
   final double totalRevenue;
   final int newCustomersThisMonth;
   final int returningCustomersThisMonth;
+  final bool loyaltyEnabled;
 
   const MerchantStats({
+    required this.merchantName,
     required this.balance,
     required this.totalCustomers,
     required this.returningCustomers,
@@ -40,13 +43,16 @@ class MerchantStats {
     required this.totalRevenue,
     required this.newCustomersThisMonth,
     required this.returningCustomersThisMonth,
+    required this.loyaltyEnabled,
   });
 
   factory MerchantStats.fromJson(Map<String, dynamic> json) {
-    // Flexible parsing — backend may nest data differently
     final data = json['data'] as Map<String, dynamic>? ?? json;
     return MerchantStats(
-      balance: (data['balance'] as num?)?.toDouble() ?? 0.0,
+      merchantName: (data['businessName'] as String?) ?? (data['merchantName'] as String?) ?? '',
+      balance: (data['balance'] as num?)?.toDouble() ??
+          (data['couponFundingBalance'] as num?)?.toDouble() ??
+          0.0,
       totalCustomers: (data['totalCustomers'] as num?)?.toInt() ?? 0,
       returningCustomers: (data['returningCustomers'] as num?)?.toInt() ?? 0,
       yapaInvestmentTotal: (data['yapaInvestmentTotal'] as num?)?.toDouble() ??
@@ -55,19 +61,25 @@ class MerchantStats {
       yapaCashbackRate: (data['yapaCashbackRate'] as num?)?.toDouble() ??
           (data['cashbackRate'] as num?)?.toDouble() ??
           0.02,
-      totalTransactions: (data['totalTransactions'] as num?)?.toInt() ?? 0,
-      totalRevenue: (data['totalRevenue'] as num?)?.toDouble() ?? 0.0,
+      totalTransactions:
+          (data['totalTransactions'] as num?)?.toInt() ??
+          (data['totalCompletedTransactions'] as num?)?.toInt() ??
+          0,
+      totalRevenue: (data['totalRevenue'] as num?)?.toDouble() ??
+          (data['totalGmv'] as num?)?.toDouble() ??
+          0.0,
       newCustomersThisMonth:
           (data['newCustomersThisMonth'] as num?)?.toInt() ?? 0,
       returningCustomersThisMonth:
           (data['returningCustomersThisMonth'] as num?)?.toInt() ??
               (data['returningCustomers'] as num?)?.toInt() ??
               0,
+      loyaltyEnabled: (data['loyaltyEnabled'] as bool?) ?? true,
     );
   }
 
-  // Fallback empty stats for error states
   static const empty = MerchantStats(
+    merchantName: '',
     balance: 0,
     totalCustomers: 0,
     returningCustomers: 0,
@@ -77,5 +89,6 @@ class MerchantStats {
     totalRevenue: 0,
     newCustomersThisMonth: 0,
     returningCustomersThisMonth: 0,
+    loyaltyEnabled: true,
   );
 }

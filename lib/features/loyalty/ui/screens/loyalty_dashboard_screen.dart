@@ -135,33 +135,70 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
                 delegate: SliverChildBuilderDelegate(
                   (_, i) {
                     final entry = _entries[i];
-                    return LoyaltyBusinessCard(
-                      businessName: entry.merchantName,
-                      category: 'Negocio local',
-                      location: 'Ecuador',
-                      tierName: entry.tierName,
-                      cashbackPercentage: entry.cashbackLabel,
-                      minPurchaseAmount: '-',
-                      visits: entry.yapasCount,
-                      progress: entry.progressValue,
-                      nextLevel: entry.nextTierName,
-                      purchasesNeeded: entry.pointsToNextCoupon?.toInt() ?? 0,
-                      businessIcon: Icons.storefront,
-                      currentYapas: entry.yapasCount,
-                      onTap: () => context.pushNamed(
-                        'business_detail',
-                        extra: {
-                          'merchantId': entry.merchantId,
-                          'name': entry.merchantName,
-                          'icon': Icons.storefront,
-                          'tier': entry.tierName,
-                          'cashback': entry.cashbackLabel,
-                          'currentPoints': entry.trustPoints.toInt(),
-                          'targetPoints': entry.targetPoints.toInt(),
-                          'activeYapas': entry.activeYapas,
-                          'totalYapasValue': entry.totalYapasValue,
-                        },
-                      ),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (entry.isDegradationRisk)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.shade50,
+                                borderRadius: BorderRadius.circular(10),
+                                border:
+                                    Border.all(color: Colors.orange.shade300),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.warning_amber_rounded,
+                                      color: Colors.orange.shade700, size: 16),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      '⚠️ Tu nivel en ${entry.merchantName} baja en ${entry.degradationRiskDays} día${entry.degradationRiskDays == 1 ? '' : 's'}. ¡Visita pronto!',
+                                      style: TextStyle(
+                                        color: Colors.orange.shade800,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        LoyaltyBusinessCard(
+                          businessName: entry.merchantName,
+                          category: 'Negocio local',
+                          location: 'Ecuador',
+                          tierName: entry.tierName,
+                          cashbackPercentage: entry.cashbackLabel,
+                          minPurchaseAmount: '-',
+                          visits: entry.yapasCount,
+                          progress: entry.progressValue,
+                          nextLevel: entry.nextTierName,
+                          purchasesNeeded:
+                              entry.pointsToNextCoupon?.toInt() ?? 0,
+                          businessIcon: Icons.storefront,
+                          currentYapas: entry.yapasCount,
+                          onTap: () => context.pushNamed(
+                            'business_detail',
+                            extra: {
+                              'merchantId': entry.merchantId,
+                              'name': entry.merchantName,
+                              'icon': Icons.storefront,
+                              'tier': entry.tierName,
+                              'cashback': entry.cashbackLabel,
+                              'currentPoints': entry.trustPoints.toInt(),
+                              'targetPoints': entry.targetPoints.toInt(),
+                              'activeYapas': entry.activeYapas,
+                              'totalYapasValue': entry.totalYapasValue,
+                            },
+                          ),
+                        ),
+                      ],
                     );
                   },
                   childCount: _entries.length,

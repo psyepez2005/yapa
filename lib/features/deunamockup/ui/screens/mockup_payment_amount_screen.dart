@@ -61,17 +61,24 @@ class _MockupPaymentAmountScreenState extends State<MockupPaymentAmountScreen> {
                   child: Column(
                     children: [
           const SizedBox(height: 24),
-          // User Avatar & Name
+          // Merchant Avatar & Name
           Container(
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(
-              color: Color(0xFFEAD8F7), // Light purple
+              color: Color(0xFFEAD8F7),
               shape: BoxShape.circle,
             ),
-            child: const Text('EJ', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
+            child: Text(
+              widget.merchantName.length >= 2
+                  ? widget.merchantName.substring(0, 2).toUpperCase()
+                  : widget.merchantName.toUpperCase(),
+              style: const TextStyle(color: Color(0xFF4A1587), fontWeight: FontWeight.bold, fontSize: 18),
+            ),
           ),
-          const SizedBox(height: 12),
-          const Text('Emilio Jose Peña Armijos', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87)),
+          const SizedBox(height: 6),
+          const Text('Pagando a', style: TextStyle(fontSize: 12, color: Colors.grey)),
+          const SizedBox(height: 2),
+          Text(widget.merchantName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black87)),
           
           const SizedBox(height: 40),
           
