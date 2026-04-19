@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:yapa/core/models/merchant_stats.dart';
 import 'package:yapa/core/services/merchant_service.dart';
+import 'campaign_impact_screen.dart';
 import 'create_yapa_screen.dart';
 
 
@@ -121,6 +122,31 @@ class _BusinessYapaTrackingScreenState
   }
 
   int get _totalYapasUsed => _stats?.activeLoyaltyCoupons ?? 0;
+
+  int get _activeCouponCount => _coupons.where((c) => c.isActive).length;
+
+  bool get _atCouponLimit => _activeCouponCount >= 5;
+
+  Future<void> _publishCoupon(MerchantCoupon coupon) async {
+    try {
+      await MerchantService().publishCoupon(coupon.id);
+      if (!mounted) return;
+      // Navegar a la Vista de Impacto de Campaña
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => CampaignImpactScreen(
+            coupon: coupon,
+            stats: _stats,
+          ),
+        ),
+      );
+    } on MerchantException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message), backgroundColor: Colors.red),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -251,8 +277,36 @@ class _BusinessYapaTrackingScreenState
                       const SizedBox(height: 28),
 
                       // ── 5. Mis Yapas creadas ─────────────────────────
-                      _sectionTitle('Mis Yapas creadas'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _sectionTitle('Mis Yapas creadas'),
+                          _CouponLimitBadge(current: _activeCouponCount, max: 5),
+                        ],
+                      ),
                       const SizedBox(height: 14),
+                      if (_atCouponLimit)
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade50,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.orange.shade200),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.info_outline, color: Colors.orange.shade700, size: 16),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Alcanzaste el límite de 5 yapas activas. Elimina una para crear otra.',
+                                  style: TextStyle(color: Colors.orange.shade800, fontSize: 12, fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       if (_coupons.isEmpty)
                         Container(
                           width: double.infinity,
@@ -393,6 +447,13 @@ class _BusinessYapaTrackingScreenState
                                   ),
                                 ),
                                 // Actions
+                                if (coupon.isActive)
+                                  IconButton(
+                                    icon: const Icon(Icons.send_outlined,
+                                        color: Color(0xFF4A1587), size: 20),
+                                    tooltip: 'Publicar a clientes',
+                                    onPressed: () => _publishCoupon(coupon),
+                                  ),
                                 IconButton(
                                   icon: const Icon(Icons.delete_outline,
                                       color: Colors.red, size: 20),
@@ -409,35 +470,41 @@ class _BusinessYapaTrackingScreenState
                       // ── 6. Bot\u00f3n Crear una Yapa ───────────────────────
                       SizedBox(
                         width: double.infinity,
-                        height: 58,
+                        height: 56,
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF4A1587),
+                            backgroundColor: _atCouponLimit
+                                ? Colors.grey.shade300
+                                : const Color(0xFF4A1587),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18),
                             ),
-                            elevation: 6,
-                            shadowColor:
-                                const Color(0xFF4A1587).withOpacity(0.35),
+                            elevation: _atCouponLimit ? 0 : 4,
+                            shadowColor: const Color(0xFF4A1587).withValues(alpha: 0.3),
                           ),
-                          icon: const Icon(Icons.add_circle_outline,
-                              color: Colors.white, size: 24),
-                          label: const Text(
-                            'Crear una Yapa',
+                          icon: Icon(
+                            Icons.add_circle_outline,
+                            color: _atCouponLimit ? Colors.grey.shade500 : Colors.white,
+                            size: 22,
+                          ),
+                          label: Text(
+                            _atCouponLimit ? 'Límite alcanzado (5/5)' : 'Crear una Yapa',
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
+                              color: _atCouponLimit ? Colors.grey.shade500 : Colors.white,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          onPressed: () async {
-                            final created = await Navigator.of(context).push<bool>(
-                              MaterialPageRoute(
-                                builder: (_) => const CreateYapaScreen(),
-                              ),
-                            );
-                            if (created == true) _load();
-                          },
+                          onPressed: _atCouponLimit
+                              ? null
+                              : () async {
+                                  final created = await Navigator.of(context).push<bool>(
+                                    MaterialPageRoute(
+                                      builder: (_) => const CreateYapaScreen(),
+                                    ),
+                                  );
+                                  if (created == true) _load();
+                                },
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -519,6 +586,43 @@ class _BusinessYapaTrackingScreenState
           color: Colors.black87,
         ),
       );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Badge: contador de yapas activas
+// ─────────────────────────────────────────────────────────────────────────────
+class _CouponLimitBadge extends StatelessWidget {
+  final int current;
+  final int max;
+
+  const _CouponLimitBadge({required this.current, required this.max});
+
+  @override
+  Widget build(BuildContext context) {
+    final atLimit = current >= max;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: atLimit
+            ? Colors.orange.shade50
+            : const Color(0xFF4A1587).withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: atLimit
+              ? Colors.orange.shade300
+              : const Color(0xFF4A1587).withValues(alpha: 0.3),
+        ),
+      ),
+      child: Text(
+        '$current / $max yapas',
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: atLimit ? Colors.orange.shade700 : const Color(0xFF4A1587),
+        ),
+      ),
+    );
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

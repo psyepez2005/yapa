@@ -85,13 +85,19 @@ class LoyaltyGlobalProgress extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
-                '\$${totalYapasValue.toStringAsFixed(2)}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 44,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -1,
+              Expanded(
+                child: FittedBox(
+                  alignment: Alignment.centerLeft,
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    '\$${totalYapasValue.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 44,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -1,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 8),

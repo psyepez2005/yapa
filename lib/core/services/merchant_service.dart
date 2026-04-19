@@ -84,6 +84,15 @@ class MerchantService {
     }
   }
 
+  Future<void> publishCoupon(String id) async {
+    try {
+      final dio = await ApiClient.merchantAuthorized();
+      await dio.post('/merchants/me/coupons/$id/publish');
+    } on DioException catch (e) {
+      throw MerchantException(_extractMessage(e));
+    }
+  }
+
   Future<void> toggleLoyalty({required bool enabled}) async {
     try {
       final dio = await ApiClient.merchantAuthorized();

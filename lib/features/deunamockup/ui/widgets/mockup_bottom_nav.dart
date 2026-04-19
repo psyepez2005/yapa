@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../screens/mapa_yapas_screen.dart';
 
 class MockupBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -36,8 +37,13 @@ class MockupBottomNav extends StatelessWidget {
               if (currentIndex != 1) context.go('/loyalty');
               break;
             case 2:
+              // Radar Screen
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const MapaYapasScreen()),
+              );
+              break;
             case 3:
-              // Wallet y perfil: decorativo por ahora
+              // Perfil decorativo
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: const Text('Próximamente disponible'),
@@ -62,9 +68,9 @@ class MockupBottomNav extends StatelessWidget {
             label: 'Beneficios',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            activeIcon: Icon(Icons.account_balance_wallet),
-            label: 'Billetera',
+            icon: Icon(Icons.radar_outlined),
+            activeIcon: Icon(Icons.radar),
+            label: 'Radar',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),

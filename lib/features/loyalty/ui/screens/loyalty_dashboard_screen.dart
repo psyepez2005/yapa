@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yapa/core/models/loyalty_profile.dart';
+import 'package:yapa/core/models/broadcast.dart';
 import 'package:yapa/core/services/loyalty_service.dart';
+import 'package:yapa/core/services/broadcast_service.dart';
 import '../widgets/loyalty_header.dart';
 import '../widgets/loyalty_global_progress.dart';
 import '../widgets/loyalty_business_card.dart';
@@ -16,8 +18,10 @@ class LoyaltyDashboardScreen extends StatefulWidget {
 
 class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
   final _service = LoyaltyService();
+  final _broadcastService = BroadcastService();
 
   List<LoyaltyProfileEntry> _entries = [];
+  List<MerchantBroadcast> _broadcasts = [];
   bool _isLoading = true;
   String? _error;
 
@@ -25,6 +29,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
   void initState() {
     super.initState();
     _loadProfile();
+    _loadBroadcasts();
   }
 
   Future<void> _loadProfile() async {
@@ -42,6 +47,15 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     }
   }
 
+  Future<void> _loadBroadcasts() async {
+    try {
+      final data = await _broadcastService.fetchBroadcasts();
+      if (mounted) setState(() => _broadcasts = data);
+    } catch (_) {
+      // broadcasts are informational — silently ignore errors
+    }
+  }
+
   double get _totalYapasValue =>
       _entries.fold(0.0, (sum, e) => sum + e.totalYapasValue);
 
@@ -53,7 +67,9 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
       body: RefreshIndicator(
-        onRefresh: _loadProfile,
+        onRefresh: () async {
+          await Future.wait([_loadProfile(), _loadBroadcasts()]);
+        },
         color: const Color(0xFF4A1587),
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -92,6 +108,10 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
                     ),
                   ),
                 ),
+              ),
+            if (_broadcasts.isNotEmpty)
+              SliverToBoxAdapter(
+                child: _BroadcastsSection(broadcasts: _broadcasts),
               ),
             SliverToBoxAdapter(
               child: Padding(
@@ -333,6 +353,144 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
               elevation: 0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Broadcasts section ────────────────────────────────────────────────────
+
+class _BroadcastsSection extends StatelessWidget {
+  final List<MerchantBroadcast> broadcasts;
+
+  const _BroadcastsSection({required this.broadcasts});
+
+  String _timeAgo(DateTime date) {
+    final diff = DateTime.now().difference(date);
+    if (diff.inMinutes < 60) return 'hace ${diff.inMinutes} min';
+    if (diff.inHours < 24) return 'hace ${diff.inHours} h';
+    return 'hace ${diff.inDays} d';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4A1587).withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.campaign_outlined, color: Color(0xFF4A1587), size: 16),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Ofertas de tus negocios',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4A1587),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${broadcasts.length}',
+                  style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...broadcasts.take(3).map((b) => _BroadcastCard(broadcast: b, timeAgo: _timeAgo(b.createdAt))),
+        ],
+      ),
+    );
+  }
+}
+
+class _BroadcastCard extends StatelessWidget {
+  final MerchantBroadcast broadcast;
+  final String timeAgo;
+
+  const _BroadcastCard({required this.broadcast, required this.timeAgo});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF4A1587).withValues(alpha: 0.15)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF4A1587).withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.local_offer_outlined, color: Color(0xFF4A1587), size: 18),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        broadcast.merchantName,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1A1A1A)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Text(timeAgo, style: TextStyle(fontSize: 11, color: Colors.grey.shade500)),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  broadcast.message,
+                  style: const TextStyle(fontSize: 12, color: Colors.black54, height: 1.4),
+                ),
+                if (broadcast.couponValue != null) ...[
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0A9E8F).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'Descuento: \$${broadcast.couponValue!.toStringAsFixed(2)}',
+                      style: const TextStyle(color: Color(0xFF0A9E8F), fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ],

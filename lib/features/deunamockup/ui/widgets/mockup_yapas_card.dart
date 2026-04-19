@@ -56,7 +56,14 @@ class _MockupYapasCardState extends State<MockupYapasCard> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) return _buildSkeleton();
-    if (_totalYapas == 0) return const SizedBox.shrink();
+    
+    // ── HACKATHON DEMO: Si no hay yapas en DB, mostramos datos falsos atractivos
+    // en lugar de ocultar la tarjeta (return SizedBox.shrink()), para que el UI nunca se dañe.
+    if (_totalYapas == 0) {
+      _totalYapas = 2;
+      _totalValue = 3.51;
+      _topMerchant = 'Ceviches de la Ruleta';
+    }
 
     return GestureDetector(
       onTap: () => context.go('/loyalty'),

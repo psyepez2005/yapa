@@ -7,6 +7,7 @@ import '../widgets/mockup_yapas_card.dart';
 import '../widgets/mockup_service_grid.dart';
 import '../widgets/mockup_promo_carousel.dart';
 import '../widgets/mockup_bottom_nav.dart';
+import 'mapa_yapas_screen.dart';
 
 class MockupHomeScreen extends StatelessWidget {
   const MockupHomeScreen({super.key});

@@ -1,32 +1,85 @@
 import 'package:flutter/material.dart';
+import 'package:yapa/core/network/api_client.dart';
 
-class MockupPromoCarousel extends StatelessWidget {
+class MockupPromoCarousel extends StatefulWidget {
   const MockupPromoCarousel({super.key});
 
   @override
+  State<MockupPromoCarousel> createState() => _MockupPromoCarouselState();
+}
+
+class _MockupPromoCarouselState extends State<MockupPromoCarousel> {
+  bool _isLoading = true;
+  List<Map<String, dynamic>> _broadcasts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBroadcasts();
+  }
+
+  Future<void> _loadBroadcasts() async {
+    try {
+      final dio = await ApiClient.userAuthorized();
+      final response = await dio.get('/loyalty/broadcasts');
+      final List data = response.data['data'] as List;
+      if (mounted) {
+        setState(() {
+          _broadcasts = data.cast<Map<String, dynamic>>();
+          _isLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Ofertas para ti', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black)),
+          const SizedBox(height: 16),
+          Container(height: 120, decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(16))),
+        ],
+      );
+    }
+
+    if (_broadcasts.isEmpty) return const SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Otros',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
+        Row(
+          children: [
+            const Text('Ofertas para ti', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black)),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE64A19),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                '${_broadcasts.length} nueva${_broadcasts.length > 1 ? 's' : ''}',
+                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
         SizedBox(
-          height: 120, // Altura fija para el carrusel
+          height: 132,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            clipBehavior: Clip.none, // Para que la sombra no se corte
-            itemCount: 3, // Número de tarjetas de muestra
+            clipBehavior: Clip.none,
+            itemCount: _broadcasts.length,
             itemBuilder: (context, index) {
               return Padding(
                 padding: const EdgeInsets.only(right: 16.0),
-                child: _PromoListCard(index: index),
+                child: _BroadcastCard(broadcast: _broadcasts[index]),
               );
             },
           ),
@@ -36,47 +89,72 @@ class MockupPromoCarousel extends StatelessWidget {
   }
 }
 
-// Sub-widget privado para mantener el archivo limpio
-class _PromoListCard extends StatelessWidget {
-  final int index;
-  const _PromoListCard({required this.index});
+class _BroadcastCard extends StatelessWidget {
+  final Map<String, dynamic> broadcast;
+  const _BroadcastCard({required this.broadcast});
 
   @override
   Widget build(BuildContext context) {
-    // Colores alternados para las tarjetas de muestra
-    final placeholderColors = [
-      const Color.fromARGB(255, 32, 167, 86), // Morado
-      const Color(0xFF00BFA5), // Turquesa
-      const Color(0xFFE64A19), // Naranja
-    ];
+    final merchantName = broadcast['merchantName'] as String? ?? 'Negocio';
+    final message = broadcast['message'] as String? ?? '';
+    final couponValue = broadcast['couponValue'];
+    final couponDouble = couponValue == null ? 0.0
+        : couponValue is num ? couponValue.toDouble()
+        : double.tryParse(couponValue.toString()) ?? 0.0;
+    final initials = merchantName.length >= 2
+        ? merchantName.substring(0, 2).toUpperCase()
+        : merchantName.toUpperCase();
 
     return Container(
-      width: 300, // Ancho de cada tarjeta (estilo banner apaisado)
+      width: 290,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: const Color(0xFF4A1587).withValues(alpha: 0.15)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Row(
         children: [
-          // Placeholder de la imagen
+          // Avatar del negocio
           Container(
-            width: 120,
+            width: 100,
             decoration: BoxDecoration(
-              color: placeholderColors[index % placeholderColors.length],
+              gradient: const LinearGradient(
+                colors: [Color(0xFF4A1587), Color(0xFF7B2FBE)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
             ),
             alignment: Alignment.center,
-            child: const Icon(Icons.image_outlined, color: Colors.white54, size: 40),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(initials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 28)),
+                if (couponDouble > 0) ...[
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF00BFA5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '-\$${couponDouble.toStringAsFixed(2)}',
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
-          // Contenido de texto
+          // Texto
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(12.0),
@@ -85,28 +163,25 @@ class _PromoListCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4CAF50), // Verde de "Sorteo"
+                      color: const Color(0xFFE64A19).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Text(
-                      'Sorteo',
-                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                    ),
+                    child: const Text('🎁 Oferta especial', style: TextStyle(color: Color(0xFFE64A19), fontSize: 10, fontWeight: FontWeight.bold)),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Gana en grande',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+                  const SizedBox(height: 6),
+                  Text(
+                    merchantName,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Haz 3 pagos en comercios',
-                    style: TextStyle(color: Color(0xFF757575), fontSize: 12),
-                    maxLines: 1,
+                  Text(
+                    message,
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 11, height: 1.3),
+                    maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -117,4 +192,4 @@ class _PromoListCard extends StatelessWidget {
       ),
     );
   }
-}
+}
