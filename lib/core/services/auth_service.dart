@@ -54,8 +54,11 @@ class AuthService {
         'ownerEmail': email,
         'password': password,
       });
-      final token = response.data['data']['accessToken'] as String;
-      await TokenStorage.saveMerchantToken(token);
+      final data = response.data['data'] as Map<String, dynamic>;
+      await Future.wait([
+        TokenStorage.saveMerchantToken(data['accessToken'] as String),
+        TokenStorage.saveMerchantId(data['merchantId'] as String),
+      ]);
     } on DioException catch (e) {
       throw AuthException(_extractMessage(e));
     }
@@ -76,8 +79,11 @@ class AuthService {
         'password': password,
         'categoryId': categoryId,
       });
-      final token = response.data['data']['accessToken'] as String;
-      await TokenStorage.saveMerchantToken(token);
+      final data = response.data['data'] as Map<String, dynamic>;
+      await Future.wait([
+        TokenStorage.saveMerchantToken(data['accessToken'] as String),
+        TokenStorage.saveMerchantId(data['merchantId'] as String),
+      ]);
     } on DioException catch (e) {
       throw AuthException(_extractMessage(e));
     }
