@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart'; // ✅ Necesario para navegar
 import '../widgets/loyalty_header.dart';
 import '../widgets/loyalty_global_progress.dart';
 import '../widgets/loyalty_business_card.dart';
@@ -28,10 +29,8 @@ class LoyaltyDashboardScreen extends StatelessWidget {
       },
     ];
 
-    // ✅ SUMAMOS LAS YAPAS DE TODOS LOS NEGOCIOS
+    // ✅ SUMAMOS LAS YAPAS Y AHORROS
     final int totalYapasSum = businesses.fold(0, (sum, b) => sum + (b['currentYapas'] as int));
-    
-    // ✅ CREAMOS EL VALOR DE AHORRO (Simulado por ahora)
     const double ahorroTotal = 15.40;
 
     return Scaffold(
@@ -42,12 +41,39 @@ class LoyaltyDashboardScreen extends StatelessWidget {
           children: [
             const LoyaltyHeader(),
             
-            // ✅ CORRECCIÓN AQUÍ: Pasamos amobs parámetros obligatorios
+            // 1. Tarjeta puramente informativa
             LoyaltyGlobalProgress(
               totalYapas: totalYapasSum,
-              totalSaved: ahorroTotal, // <-- El dato que faltaba
+              totalSaved: ahorroTotal,
             ),
 
+            // ✅ 2. NUEVO BOTÓN DEDICADO PARA VER LAS YAPAS
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => context.pushNamed('my_yapas'),
+                  icon: const Icon(Icons.stars_rounded, color: Colors.white),
+                  label: const Text(
+                    'Ver mis Yapas disponibles', 
+                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4A1587), // Morado institucional
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 12),
+
+            // 3. Título de la sección
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
@@ -56,6 +82,7 @@ class LoyaltyDashboardScreen extends StatelessWidget {
               ),
             ),
 
+            // 4. Lista de comercios
             ...businesses.map((b) => LoyaltyBusinessCard(
               businessName: b['name'] as String,
               category: b['category'] as String,

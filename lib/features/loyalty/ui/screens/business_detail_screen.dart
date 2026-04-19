@@ -1,31 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart'; // ✅ Necesario para navegar
 import 'package:yapa/features/deunamockup/ui/widgets/mockup_bottom_nav.dart';
 
-// Importa tus widgets locales
 import '../widgets/business_header.dart';
 import '../widgets/transaction_list_item.dart';
-import '../widgets/trust_points_progress.dart'; // <-- No olvides importar este también
+import '../widgets/trust_points_progress.dart';
 
 class BusinessDetailScreen extends StatelessWidget {
   final String businessName;
   final IconData businessIcon;
   final String tierName;
-  final String cashbackPercentage;
   final List<Map<String, dynamic>> transactions;
-  
-  // VARIABLES FALTANTES AGREGADAS AQUÍ:
   final int currentTrustPoints;
   final int targetTrustPoints;
+  final int availableYapas; // ✅ NUEVA VARIABLE: Yapas disponibles
 
   const BusinessDetailScreen({
     super.key,
     required this.businessName,
     required this.businessIcon,
     required this.tierName,
-    required this.cashbackPercentage,
     required this.transactions,
-    required this.currentTrustPoints, // <-- Agregado al constructor
-    required this.targetTrustPoints,  // <-- Agregado al constructor
+    required this.currentTrustPoints, 
+    required this.targetTrustPoints,
+    required this.availableYapas, // ✅ Requerido en constructor
   });
 
   @override
@@ -51,9 +49,48 @@ class BusinessDetailScreen extends StatelessWidget {
             businessName: businessName,
             businessIcon: businessIcon,
             tierName: tierName,
-            cashbackPercentage: cashbackPercentage,
           ),
-          const SizedBox(height: 16),
+          
+          // ✅ NUEVO BANNER DE YAPAS DISPONIBLES
+          if (availableYapas > 0)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+              child: InkWell(
+                onTap: () {
+                  context.pushNamed('business_yapas', extra: {
+                    'name': businessName,
+                    'yapas': availableYapas,
+                  });
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4A1587), // Fondo Morado
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.card_giftcard, color: Colors.white, size: 20),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Tienes $availableYapas Yapas disponibles',
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                        ],
+                      ),
+                      const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 14),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          
+          const SizedBox(height: 8),
+
           Expanded(
             child: Container(
               width: double.infinity,
@@ -93,7 +130,6 @@ class BusinessDetailScreen extends StatelessWidget {
               ),
             ),
           ),
-          // AÑADIMOS EL WIDGET DE PROGRESO AQUÍ ABAJO
           TrustPointsProgress(
             currentPoints: currentTrustPoints,
             targetPoints: targetTrustPoints,
