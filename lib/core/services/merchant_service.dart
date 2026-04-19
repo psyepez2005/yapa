@@ -38,6 +38,46 @@ class MerchantService {
     }
   }
 
+  Future<void> topUpFund(double amount) async {
+    try {
+      final dio = await ApiClient.merchantAuthorized();
+      await dio.post('/merchants/me/fund', data: {'amount': amount});
+    } on DioException catch (e) {
+      throw MerchantException(_extractMessage(e));
+    }
+  }
+
+  Future<MerchantCoupon> createCoupon({
+    required double value,
+    required double minimumPurchase,
+    required String code,
+    required String expiresAt,
+  }) async {
+    try {
+      final dio = await ApiClient.merchantAuthorized();
+      final response = await dio.post('/merchants/me/coupons', data: {
+        'value': value,
+        'minimumPurchase': minimumPurchase,
+        'code': code,
+        'expiresAt': expiresAt,
+      });
+      final body = response.data;
+      final data = (body is Map ? body['data'] : body) as Map<String, dynamic>;
+      return MerchantCoupon.fromJson(data);
+    } on DioException catch (e) {
+      throw MerchantException(_extractMessage(e));
+    }
+  }
+
+  Future<void> toggleLoyalty({required bool enabled}) async {
+    try {
+      final dio = await ApiClient.merchantAuthorized();
+      await dio.patch('/merchants/me/loyalty', data: {'enabled': enabled});
+    } on DioException catch (e) {
+      throw MerchantException(_extractMessage(e));
+    }
+  }
+
   String _extractMessage(DioException e) {
     final data = e.response?.data;
     if (data is Map && data['error'] != null) return data['error'].toString();

@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class MockupPaymentAmountScreen extends StatefulWidget {
-  const MockupPaymentAmountScreen({super.key});
+  final String merchantId;
+  final String merchantName;
+
+  const MockupPaymentAmountScreen({
+    super.key,
+    required this.merchantId,
+    required this.merchantName,
+  });
 
   @override
   State<MockupPaymentAmountScreen> createState() => _MockupPaymentAmountScreenState();
@@ -104,7 +111,11 @@ class _MockupPaymentAmountScreenState extends State<MockupPaymentAmountScreen> {
               height: 54,
               child: ElevatedButton(
                 onPressed: _amount.isNotEmpty ? () {
-                  context.pushNamed('payment_confirmation', pathParameters: {'amount': _amount});
+                  context.pushNamed('payment_confirmation', extra: {
+                    'amount': _amount,
+                    'merchantId': widget.merchantId,
+                    'merchantName': widget.merchantName,
+                  });
                 } : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _amount.isNotEmpty ? const Color(0xFF4A1587) : Colors.grey.shade300,

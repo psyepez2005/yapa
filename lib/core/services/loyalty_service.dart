@@ -24,6 +24,38 @@ class LoyaltyService {
     }
   }
 
+  Future<List<Map<String, dynamic>>> fetchTransactionHistory(String merchantId) async {
+    try {
+      final dio = await ApiClient.userAuthorized();
+      final response = await dio.get('/loyalty/merchants/$merchantId/transactions');
+      final List data = response.data['data'] as List;
+      return data.cast<Map<String, dynamic>>();
+    } on DioException catch (e) {
+      throw LoyaltyException(_extractMessage(e));
+    }
+  }
+
+  Future<Map<String, dynamic>> scanTransaction(
+    String merchantId,
+    double amount, {
+    String? couponId,
+  }) async {
+    try {
+      final dio = await ApiClient.userAuthorized();
+      final payload = {
+        'merchantId': merchantId,
+        'amount': amount,
+      };
+      if (couponId != null && couponId.isNotEmpty) {
+        payload['couponId'] = couponId;
+      }
+      final response = await dio.post('/loyalty/scan', data: payload);
+      return response.data['data'] as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw LoyaltyException(_extractMessage(e));
+    }
+  }
+
   String _extractMessage(DioException e) {
     final data = e.response?.data;
     if (data is Map && data['error'] != null) return data['error'].toString();

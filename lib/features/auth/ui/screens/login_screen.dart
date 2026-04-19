@@ -9,11 +9,11 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+            child: Column(
+              children: [
               // Top Section
               Column(
                 children: [
@@ -83,7 +83,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
+              const SizedBox(height: 40), // Espaciado seguro sin overflow
               // Bottom Section
               Column(
                 children: [
@@ -160,6 +160,7 @@ class LoginScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

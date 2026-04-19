@@ -1,9 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';class MockupQrScannerScreen extends StatelessWidget {
+import 'package:go_router/go_router.dart';
+import 'package:yapa/core/models/loyalty_profile.dart';
+import 'package:yapa/core/services/loyalty_service.dart';
+
+class MockupQrScannerScreen extends StatefulWidget {
   const MockupQrScannerScreen({super.key});
 
-  // Este es el método que crea la ventana emergente
+  @override
+  State<MockupQrScannerScreen> createState() => _MockupQrScannerScreenState();
+}
+
+class _MockupQrScannerScreenState extends State<MockupQrScannerScreen> {
+  LoyaltyProfileEntry? _simulatedMerchant;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSimulatedMerchant();
+  }
+
+  Future<void> _loadSimulatedMerchant() async {
+    try {
+      final profile = await LoyaltyService().fetchProfile();
+      if (profile.isNotEmpty) {
+        // Encontrar uno que tenga yapas activas, o al menos el primero
+        final withYapas = profile.where((element) => element.activeYapas.isNotEmpty).toList();
+        if (withYapas.isNotEmpty) {
+          _simulatedMerchant = withYapas.first;
+        } else {
+          _simulatedMerchant = profile.first;
+        }
+      }
+    } catch (e) {
+      debugPrint('Error loading profile for scanner: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   void _showSimulatedScanDialog(BuildContext context) {
+    if (_isLoading) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cargando cámara...')),
+      );
+      return;
+    }
+    
+    final marchantName = _simulatedMerchant?.merchantName ?? 'Tienda Demo';
+    final merchantId = _simulatedMerchant?.merchantId ?? 'm001-demo-uuid';
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -13,12 +63,12 @@ import 'package:go_router/go_router.dart';class MockupQrScannerScreen extends St
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
-              mainAxisSize: MainAxisSize.min, // Se ajusta al contenido
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: const BoxDecoration(
-                    color: Color(0xFFE0F2F1), // Fondo turquesa clarito
+                    color: Color(0xFFE0F2F1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.qr_code_scanner, color: Color(0xFF00BFA5), size: 48),
@@ -33,9 +83,9 @@ import 'package:go_router/go_router.dart';class MockupQrScannerScreen extends St
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Tienda Don Pepe',
-                  style: TextStyle(
+                Text(
+                  marchantName,
+                  style: const TextStyle(
                     fontSize: 18,
                     color: Color(0xFF4A1587),
                     fontWeight: FontWeight.w600,
@@ -52,8 +102,11 @@ import 'package:go_router/go_router.dart';class MockupQrScannerScreen extends St
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pop(); // Cierra el modal
-                      context.pushNamed('payment_amount'); // Nueva redirección
+                      Navigator.of(context).pop();
+                      context.pushNamed('payment_amount', extra: {
+                        'merchantId': merchantId,
+                        'merchantName': marchantName,
+                      });
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF4A1587),
@@ -70,7 +123,7 @@ import 'package:go_router/go_router.dart';class MockupQrScannerScreen extends St
                 ),
                 const SizedBox(height: 12),
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(), // Cierra el modal
+                  onPressed: () => Navigator.of(context).pop(),
                   child: const Text(
                     'Cancelar',
                     style: TextStyle(color: Colors.grey, fontSize: 14, fontWeight: FontWeight.bold),
@@ -90,7 +143,6 @@ import 'package:go_router/go_router.dart';class MockupQrScannerScreen extends St
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // --- CAPA DE FONDO (LA "CÁMARA") ---
           Image.network(
             'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=1000&auto=format&fit=crop',
             fit: BoxFit.cover,
@@ -100,7 +152,6 @@ import 'package:go_router/go_router.dart';class MockupQrScannerScreen extends St
             color: Colors.black.withOpacity(0.5),
           ),
 
-          // --- CAPA DE INTERFAZ ---
           SafeArea(
             child: Stack(
               children: [
@@ -117,22 +168,23 @@ import 'package:go_router/go_router.dart';class MockupQrScannerScreen extends St
                     ),
                     const SizedBox(height: 40),
                     
-                    // ✅ AQUÍ ESTÁ EL ÁREA INTERACTIVA
                     Center(
                       child: Material(
-                        color: Colors.transparent, // Transparente para ver el fondo
+                        color: Colors.transparent,
                         borderRadius: BorderRadius.circular(24),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(24),
-                          splashColor: const Color(0xFF00BFA5).withOpacity(0.3), // Splash turquesa
+                          splashColor: const Color(0xFF00BFA5).withOpacity(0.3),
                           highlightColor: const Color(0xFF00BFA5).withOpacity(0.1),
-                          onTap: () => _showSimulatedScanDialog(context), // Llama al modal
+                          onTap: () => _isLoading ? null : _showSimulatedScanDialog(context),
                           child: SizedBox(
                             width: 250,
                             height: 250,
-                            child: CustomPaint(
-                              painter: _QrCornerPainter(color: const Color(0xFF00BFA5)),
-                            ),
+                            child: _isLoading 
+                                ? const Center(child: CircularProgressIndicator(color: Color(0xFF00BFA5)))
+                                : CustomPaint(
+                                    painter: _QrCornerPainter(color: const Color(0xFF00BFA5)),
+                                  ),
                           ),
                         ),
                       ),
@@ -142,7 +194,6 @@ import 'package:go_router/go_router.dart';class MockupQrScannerScreen extends St
                   ],
                 ),
 
-                // --- BARRA SUPERIOR ---
                 Positioned(
                   top: 16,
                   left: 16,
@@ -166,7 +217,6 @@ import 'package:go_router/go_router.dart';class MockupQrScannerScreen extends St
                   ),
                 ),
 
-                // --- BOTONES INFERIORES ---
                 Positioned(
                   bottom: 40,
                   left: 24,
@@ -175,13 +225,13 @@ import 'package:go_router/go_router.dart';class MockupQrScannerScreen extends St
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: () => _showSimulatedScanDialog(context),
+                      onPressed: _isLoading ? null : () => _showSimulatedScanDialog(context),
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
                           if (states.contains(MaterialState.hovered) || states.contains(MaterialState.pressed)) {
-                            return const Color(0xFF4A1587); // Morado hover
+                            return const Color(0xFF4A1587);
                           }
-                          return Colors.white; // Blanco por defecto
+                          return Colors.white;
                         }),
                         foregroundColor: MaterialStateProperty.resolveWith<Color>((states) {
                           if (states.contains(MaterialState.hovered) || states.contains(MaterialState.pressed)) {

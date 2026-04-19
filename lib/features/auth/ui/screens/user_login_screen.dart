@@ -42,8 +42,13 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
           email: _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
         );
       } else {
+        String formattedPhone = _phoneCtrl.text.trim();
+        if (!formattedPhone.startsWith('+')) {
+          formattedPhone = '+$formattedPhone'; // Auto-añade + si el usaurio no lo puso (para match de la BD)
+        }
+        
         await _authService.loginUser(
-          _phoneCtrl.text.trim(),
+          formattedPhone,
           _passwordCtrl.text,
         );
       }

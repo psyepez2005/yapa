@@ -126,6 +126,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
                       onTap: () => context.pushNamed(
                         'business_detail',
                         extra: {
+                          'merchantId': entry.merchantId,
                           'name': entry.merchantName,
                           'icon': Icons.storefront,
                           'tier': entry.tierName,

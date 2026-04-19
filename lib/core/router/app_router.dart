@@ -57,6 +57,11 @@ class AppRouter {
         builder: (context, state) => const QrScannerScreen(),
       ),
       GoRoute(
+        path: '/mockup-scanner',
+        name: 'mockup_scanner',
+        builder: (context, state) => const MockupQrScannerScreen(),
+      ),
+      GoRoute(
         path: '/my-yapas',
         name: 'my_yapas',
         builder: (context, state) {
@@ -69,23 +74,36 @@ class AppRouter {
       GoRoute(
         path: '/payment-amount',
         name: 'payment_amount',
-        builder: (context, state) => const MockupPaymentAmountScreen(),
-      ),
-      GoRoute(
-        path: '/payment-confirmation/:amount',
-        name: 'payment_confirmation',
         builder: (context, state) {
-          final amount = state.pathParameters['amount'] ?? '0.00';
-          return MockupPaymentConfirmationScreen(amount: amount);
+          final data = (state.extra as Map<String, dynamic>?) ?? {};
+          return MockupPaymentAmountScreen(
+            merchantId: data['merchantId'] as String? ?? '',
+            merchantName: data['merchantName'] as String? ?? 'Desconocido',
+          );
         },
       ),
       GoRoute(
-        path: '/payment-receipt/:amount/:yapa',
+        path: '/payment-confirmation',
+        name: 'payment_confirmation',
+        builder: (context, state) {
+          final data = (state.extra as Map<String, dynamic>?) ?? {};
+          return MockupPaymentConfirmationScreen(
+            merchantId: data['merchantId'] as String? ?? '',
+            merchantName: data['merchantName'] as String? ?? 'Desconocido',
+            amount: data['amount'] as String? ?? '0.00',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/payment-receipt',
         name: 'payment_receipt',
         builder: (context, state) {
-          final amount = state.pathParameters['amount'] ?? '0.00';
-          final yapa = state.pathParameters['yapa'] ?? 'NINGUNA';
-          return MockupPaymentReceiptScreen(amount: amount, usedYapa: yapa);
+          final data = (state.extra as Map<String, dynamic>?) ?? {};
+          return MockupPaymentReceiptScreen(
+            amount: data['amount'] as String? ?? '0.00',
+            merchantName: data['merchantName'] as String? ?? 'Desconocido',
+            transactionResult: data['result'] as Map<String, dynamic>?,
+          );
         },
       ),
       GoRoute(
@@ -97,23 +115,15 @@ class AppRouter {
           final activeYapas =
               (data['activeYapas'] as List?)?.cast<ActiveYapa>() ?? [];
 
-          // Historial mock mientras no existe endpoint de transacciones
-          final mockTransactions = [
-            {'date': '18 Abr 2026, 10:30', 'amount': 15.50, 'points': 15},
-            {'date': '15 Abr 2026, 14:15', 'amount': 8.00, 'points': 8},
-            {'date': '10 Abr 2026, 09:00', 'amount': 22.40, 'points': 22},
-          ];
-
           return BusinessDetailScreen(
             businessName: data['name'] as String,
             businessIcon: data['icon'],
+            merchantId: data['merchantId'] as String,
             tierName: data['tier'] as String,
             cashbackPercentage: data['cashback'] as String,
             currentTrustPoints: (data['currentPoints'] as num?)?.toInt() ?? 0,
             targetTrustPoints: (data['targetPoints'] as num?)?.toInt() ?? 100,
             activeYapas: activeYapas,
-            transactions: data['transactions'] as List<Map<String, dynamic>>? ??
-                mockTransactions,
           );
         },
       ),

@@ -3,12 +3,14 @@ import 'package:go_router/go_router.dart';
 
 class MockupPaymentReceiptScreen extends StatelessWidget {
   final String amount;
-  final String usedYapa;
+  final String merchantName;
+  final Map<String, dynamic>? transactionResult;
 
   const MockupPaymentReceiptScreen({
     super.key,
     required this.amount,
-    required this.usedYapa,
+    required this.merchantName,
+    this.transactionResult,
   });
 
   @override
@@ -16,7 +18,13 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
     // Generar formato de fechas simulado
     final now = DateTime.now();
     final dateStr = '${now.day} abr ${now.year} - ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-    final txNumber = DateTime.now().millisecondsSinceEpoch.toString();
+    
+    // Extraer datos del resultado real enviado por AWS
+    final String txNumber = transactionResult?['transactionId']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString();
+    final num trustPointsEarned = transactionResult?['trustPointsEarned'] as num? ?? 0;
+    final Map<String, dynamic>? couponApplied = transactionResult?['couponApplied'];
+    final Map<String, dynamic>? couponUnlocked = transactionResult?['couponUnlocked'];
+    final bool antifraudBlocked = transactionResult?['antifraudBlocked'] == true;
 
     return Scaffold(
       backgroundColor: const Color(0xFF3B1066), // Fondo morado oscuro
@@ -59,16 +67,19 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                           const Text('d!', style: TextStyle(color: Color(0xFF4A1587), fontStyle: FontStyle.italic, fontWeight: FontWeight.w900, fontSize: 40)),
                           const SizedBox(height: 16),
                           // Título
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 24),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
                             child: Text(
-                              'Pagaste a Tienda Don Pepe',
+                              'Pagaste a $merchantName',
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Color(0xFF4A1587), fontSize: 24, fontWeight: FontWeight.w700),
+                              style: const TextStyle(color: Color(0xFF4A1587), fontSize: 24, fontWeight: FontWeight.w700),
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const Text('Tu dinero llegó al instante', style: TextStyle(color: Colors.grey, fontSize: 14)),
+                          Text(
+                            antifraudBlocked ? 'Pago bloqueado por prevención de fraude' : 'Tu dinero llegó al instante', 
+                            style: TextStyle(color: antifraudBlocked ? Colors.red : Colors.grey, fontSize: 14, fontWeight: antifraudBlocked ? FontWeight.bold : FontWeight.normal),
+                          ),
                           const SizedBox(height: 24),
                           // Valor final cobrado
                           Text(
@@ -77,13 +88,13 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           
-                          // --- YAPA APLICADA INJECTION (El Hack Psicológico) ---
-                          if (usedYapa != 'NINGUNA')
+                          // --- YAPA APLICADA INJECTION ---
+                          if (couponApplied != null)
                             Container(
                               margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE8F5E9), // Menta/verde claro validación
+                                color: const Color(0xFFE8F5E9),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: Colors.green.shade200),
                               ),
@@ -92,11 +103,16 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                                 children: [
                                   const Icon(Icons.check_circle_rounded, color: Colors.green, size: 20),
                                   const SizedBox(width: 8),
-                                  Text('¡Descuento Yapa $usedYapa aplicado! 🎁', style: TextStyle(color: Colors.green.shade800, fontWeight: FontWeight.bold, fontSize: 13)),
+                                  Expanded(
+                                    child: Text(
+                                      '¡Descuento Yapa aplicado! (-\$${(couponApplied['discountAmount'] as num).toStringAsFixed(2)}) 🎁', 
+                                      style: TextStyle(color: Colors.green.shade800, fontWeight: FontWeight.bold, fontSize: 13),
+                                    ),
+                                  ),
                                 ],
                               ),
                             )
-                          else
+                          else if (!antifraudBlocked)
                             const Padding(
                               padding: EdgeInsets.symmetric(vertical: 8),
                               child: Text(
@@ -124,10 +140,66 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 const Text('Nro. de transacción', style: TextStyle(color: Color(0xFF4A1587), fontWeight: FontWeight.bold, fontSize: 13)),
-                                Text(txNumber, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                                Flexible(child: Text(txNumber.length > 15 ? '${txNumber.substring(0, 15)}...' : txNumber, style: const TextStyle(color: Colors.grey, fontSize: 13))),
                               ],
                             ),
                           ),
+                          const SizedBox(height: 32),
+                          
+                          // Earned Pts & Yapa unlocking integration
+                          if (!antifraudBlocked)
+                            Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 24),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF3E5F5), // Light purple
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.stars, color: Color(0xFF4A1587), size: 32),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text('¡Suma Deuna Puntos!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF4A1587))),
+                                            Text('Ganaste +$trustPointsEarned pts de confianza', style: const TextStyle(color: Colors.black87, fontSize: 13)),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  if (couponUnlocked != null) ...[
+                                    const SizedBox(height: 16),
+                                    const Divider(),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(color: Colors.yellow.shade100, shape: BoxShape.circle),
+                                          child: const Text('🎉', style: TextStyle(fontSize: 18)),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              const Text('¡NUEVA YAPA DESBLOQUEADA!', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.black, fontSize: 13)),
+                                              Text(couponUnlocked['message']?.toString() ?? 'Recibiste un cupón', style: const TextStyle(color: Color(0xFFD32F2F), fontWeight: FontWeight.bold, fontSize: 13)),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+
                           const SizedBox(height: 32),
                           
                           // QR Code Mockup (Placeholder elegante)
@@ -172,9 +244,9 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                           const SizedBox(height: 24),
                           
                           // De / Para section
-                          _buildTransferParty(title: 'De', initials: 'TÚ', name: 'Usuario Actual', subtext: 'Banco Pichincha ******6971', avatarColor: const Color(0xFFEAD8F7)),
+                          _buildTransferParty(title: 'De', initials: 'TÚ', name: 'Tu Cuenta Deuna', subtext: 'Banco Pichincha ******6971', avatarColor: const Color(0xFFEAD8F7)),
                           const SizedBox(height: 16),
-                          _buildTransferParty(title: 'Para', initials: 'DP', name: 'Tienda Don Pepe', subtext: 'Banco Pichincha ******5424', avatarColor: const Color(0xFFEAD8F7)),
+                          _buildTransferParty(title: 'Para', initials: merchantName.substring(0, 2).toUpperCase(), name: merchantName, subtext: 'Cobro por escáner de pagos', avatarColor: const Color(0xFFEAD8F7)),
                           
                           const SizedBox(height: 24),
                           // Buttons

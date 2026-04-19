@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:yapa/core/models/loyalty_profile.dart';
+import 'package:yapa/core/services/loyalty_service.dart';
+import 'package:intl/intl.dart';
 import 'package:yapa/features/deunamockup/ui/widgets/mockup_bottom_nav.dart';
 
 import '../widgets/business_header.dart';
 import '../widgets/transaction_list_item.dart';
 import '../widgets/trust_points_progress.dart';
 
-class BusinessDetailScreen extends StatelessWidget {
+class BusinessDetailScreen extends StatefulWidget {
   final String businessName;
   final IconData businessIcon;
+  final String merchantId;
   final String tierName;
   final String cashbackPercentage;
-  final List<Map<String, dynamic>> transactions;
   final int currentTrustPoints;
   final int targetTrustPoints;
   final List<ActiveYapa> activeYapas;
@@ -20,13 +22,44 @@ class BusinessDetailScreen extends StatelessWidget {
     super.key,
     required this.businessName,
     required this.businessIcon,
+    required this.merchantId,
     required this.tierName,
     required this.cashbackPercentage,
-    required this.transactions,
     required this.currentTrustPoints,
     required this.targetTrustPoints,
     this.activeYapas = const [],
   });
+
+  @override
+  State<BusinessDetailScreen> createState() => _BusinessDetailScreenState();
+}
+
+class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
+  final _service = LoyaltyService();
+  bool _isLoadingTxs = true;
+  List<Map<String, dynamic>> _transactions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTransactions();
+  }
+
+  Future<void> _loadTransactions() async {
+    try {
+      final txs = await _service.fetchTransactionHistory(widget.merchantId);
+      if (mounted) {
+        setState(() {
+          _transactions = txs;
+          _isLoadingTxs = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoadingTxs = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,20 +89,20 @@ class BusinessDetailScreen extends StatelessWidget {
               child: Column(
                 children: [
                   BusinessHeader(
-                    businessName: businessName,
-                    businessIcon: businessIcon,
-                    tierName: tierName,
-                    cashbackPercentage: cashbackPercentage,
+                    businessName: widget.businessName,
+                    businessIcon: widget.businessIcon,
+                    tierName: widget.tierName,
+                    cashbackPercentage: widget.cashbackPercentage,
                   ),
-                  if (activeYapas.isNotEmpty) _buildActiveYapasSection(),
+                  if (widget.activeYapas.isNotEmpty) _buildActiveYapasSection(),
                   _buildTransactionsSection(),
                 ],
               ),
             ),
           ),
           TrustPointsProgress(
-            currentPoints: currentTrustPoints,
-            targetPoints: targetTrustPoints,
+            currentPoints: widget.currentTrustPoints,
+            targetPoints: widget.targetTrustPoints,
           ),
           const MockupBottomNav(currentIndex: 0),
         ],
@@ -78,7 +111,7 @@ class BusinessDetailScreen extends StatelessWidget {
   }
 
   Widget _buildActiveYapasSection() {
-    final total = activeYapas.fold(0.0, (s, y) => s + y.value);
+    final total = widget.activeYapas.fold(0.0, (s, y) => s + y.value);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
@@ -118,7 +151,7 @@ class BusinessDetailScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          ...activeYapas.map(
+          ...widget.activeYapas.map(
             (yapa) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
@@ -193,22 +226,43 @@ class BusinessDetailScreen extends StatelessWidget {
               ),
             ),
           ),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            itemCount: transactions.length,
-            separatorBuilder: (_, __) =>
-                Divider(color: Colors.grey.shade200, height: 1),
-            itemBuilder: (_, i) {
-              final tx = transactions[i];
-              return TransactionListItem(
-                date: tx['date'] as String,
-                amount: (tx['amount'] as num).toDouble(),
-                points: tx['points'] as int,
-              );
-            },
-          ),
+          if (_isLoadingTxs)
+            const Padding(
+              padding: EdgeInsets.all(32.0),
+              child: Center(
+                child: CircularProgressIndicator(color: Color(0xFF4A1587)),
+              ),
+            )
+          else if (_transactions.isEmpty)
+            const Padding(
+              padding: EdgeInsets.all(32.0),
+              child: Center(
+                child: Text('Aún no tienes historial de gastos.',
+                    style: TextStyle(color: Colors.grey)),
+              ),
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              itemCount: _transactions.length,
+              separatorBuilder: (_, __) =>
+                  Divider(color: Colors.grey.shade200, height: 1),
+              itemBuilder: (_, i) {
+                final tx = _transactions[i];
+                // Formatear fecha
+                final dt = DateTime.parse(tx['date'] as String);
+                final formattedDate =
+                    DateFormat("dd MMM yyyy, HH:mm", "es_ES").format(dt);
+
+                return TransactionListItem(
+                  date: formattedDate,
+                  amount: (tx['amount'] as num).toDouble(),
+                  points: (tx['pointsEarned'] as num).toInt(),
+                );
+              },
+            ),
           const SizedBox(height: 16),
         ],
       ),
