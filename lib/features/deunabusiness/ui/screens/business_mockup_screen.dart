@@ -10,6 +10,7 @@ import '../widgets/cobrar_view.dart';
 import '../widgets/qr_view.dart';
 import '../widgets/gestionar_view.dart';
 import 'business_yapa_tracking_screen.dart';
+import 'create_yapa_screen.dart';
 
 export '../widgets/cobrar_view.dart' show CobrarMode;
 
@@ -172,141 +173,6 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
     );
   }
 
-  void _showCreateCouponModal() {
-    final valueCtrl = TextEditingController();
-    final minPurchaseCtrl = TextEditingController();
-    final codeCtrl = TextEditingController();
-    DateTime? expiresAt;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setModal) => Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx).viewInsets.bottom,
-            left: 24, right: 24, top: 24,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Nueva Yapa', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
-                const Text('Configura un cupón de descuento para tus clientes', style: TextStyle(color: Colors.grey, fontSize: 13)),
-                const SizedBox(height: 20),
-                _modalField(valueCtrl, 'Valor del descuento', prefix: '\$ ', numeric: true),
-                const SizedBox(height: 12),
-                _modalField(minPurchaseCtrl, 'Compra mínima requerida', prefix: '\$ ', numeric: true),
-                const SizedBox(height: 12),
-                _modalField(codeCtrl, 'Código (4-20 caracteres)', hint: 'Ej: YAPA2024'),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.calendar_today, size: 16, color: Color(0xFF4A1587)),
-                  label: Text(
-                    expiresAt == null
-                        ? 'Seleccionar fecha de vencimiento'
-                        : 'Vence: ${expiresAt!.day}/${expiresAt!.month}/${expiresAt!.year}',
-                    style: const TextStyle(color: Color(0xFF4A1587)),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF4A1587)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  onPressed: () async {
-                    final picked = await showDatePicker(
-                      context: ctx,
-                      initialDate: DateTime.now().add(const Duration(days: 30)),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(const Duration(days: 365)),
-                    );
-                    if (picked != null) setModal(() => expiresAt = picked);
-                  },
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF4A1587),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    onPressed: () async {
-                      final value = double.tryParse(valueCtrl.text.replaceAll(',', '.'));
-                      final minPurchase = double.tryParse(minPurchaseCtrl.text.replaceAll(',', '.'));
-                      final code = codeCtrl.text.trim();
-                      if (value == null || minPurchase == null || code.length < 4 || expiresAt == null) {
-                        ScaffoldMessenger.of(ctx).showSnackBar(
-                          const SnackBar(content: Text('Completa todos los campos correctamente')),
-                        );
-                        return;
-                      }
-                      Navigator.pop(ctx);
-                      try {
-                        final coupon = await MerchantService().createCoupon(
-                          name: 'Generado desde Mockup',
-                          value: value,
-                          minimumPurchase: minPurchase,
-                          code: code,
-                          expiresAt: expiresAt!.toIso8601String(),
-                        );
-                        if (mounted) {
-                          setState(() => _coupons = [..._coupons, coupon]);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Yapa creada exitosamente'),
-                              backgroundColor: Color(0xFF0A9E8F),
-                            ),
-                          );
-                        }
-                      } on MerchantException catch (e) {
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(e.message), backgroundColor: Colors.red),
-                          );
-                        }
-                      }
-                    },
-                    child: const Text('Crear Yapa', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-                const SizedBox(height: 24),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _modalField(
-    TextEditingController ctrl,
-    String label, {
-    String? prefix,
-    String? hint,
-    bool numeric = false,
-  }) {
-    return TextField(
-      controller: ctrl,
-      keyboardType: numeric ? const TextInputType.numberWithOptions(decimal: true) : TextInputType.text,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        prefixText: prefix,
-        border: const OutlineInputBorder(),
-        focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Color(0xFF4A1587), width: 2),
-        ),
-      ),
-    );
-  }
-
   void _onKeypadTap(String key) {
     setState(() {
       if (key == 'delete') {
@@ -323,7 +189,10 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const BusinessAppBar(),
+      appBar: BusinessAppBar(
+        merchantName: _stats?.merchantName ?? '',
+        onLogout: _logout,
+      ),
       body: Column(
         children: [
           BusinessTabBar(
@@ -376,9 +245,19 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
                     stats: _stats,
                     coupons: _coupons,
                     loadingStats: _loadingStats,
+                    loyaltyEnabled: _loyaltyEnabled,
+                    togglingLoyalty: _togglingLoyalty,
                     onRefresh: _loadStats,
                     onTopUp: _showTopUpModal,
-                    onCreateCoupon: _showCreateCouponModal,
+                    onToggleLoyalty: _toggleLoyalty,
+                    onCreateCoupon: () async {
+                      final created = await Navigator.of(context).push<bool>(
+                        MaterialPageRoute(
+                          builder: (_) => const CreateYapaScreen(),
+                        ),
+                      );
+                      if (created == true) _loadStats();
+                    },
                     onNavigateToYapa: () {
                       setState(() => _navIndex = 2);
                       Navigator.of(context).push(

@@ -19,6 +19,9 @@ class _CreateYapaScreenState extends State<CreateYapaScreen> {
   final List<double> _minPurchaseOptions = [3.00, 5.00, 10.00, 15.00];
   double _selectedMinPurchase = 5.00;
 
+  final List<int> _quantityOptions = [1, 5, 10, 20, 50];
+  int _selectedQuantity = 1;
+
   final List<_AudienceOption> _audiences = [
     _AudienceOption('todos', 'Todos', Icons.groups, 'Cualquier cliente'),
     _AudienceOption('nuevos', 'Nuevos', Icons.person_add, 'Primera vez en tu negocio'),
@@ -60,6 +63,7 @@ class _CreateYapaScreenState extends State<CreateYapaScreen> {
         minimumPurchase: _selectedMinPurchase,
         code: code,
         expiresAt: DateTime.now().add(const Duration(days: 30)).toIso8601String(),
+        quantity: _selectedQuantity,
       );
 
       if (!mounted) return;
@@ -143,16 +147,9 @@ class _CreateYapaScreenState extends State<CreateYapaScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF4A1587)),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('\u2728', style: TextStyle(fontSize: 18)),
-            SizedBox(width: 8),
-            Text(
-              'Crear una Yapa',
-              style: TextStyle(color: Color(0xFF4A1587), fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-          ],
+        title: const Text(
+          'Crear una Yapa',
+          style: TextStyle(color: Color(0xFF4A1587), fontWeight: FontWeight.bold, fontSize: 18),
         ),
         centerTitle: true,
       ),
@@ -183,7 +180,7 @@ class _CreateYapaScreenState extends State<CreateYapaScreen> {
           children: [
             // Nombre
             _SectionCard(
-              emoji: '\u270F\uFE0F',
+              icon: Icons.edit_outlined,
               title: '\u00BFC\u00F3mo se llama tu Yapa?',
               subtitle: 'Un nombre f\u00E1cil para que la reconozcan',
               child: TextField(
@@ -210,7 +207,7 @@ class _CreateYapaScreenState extends State<CreateYapaScreen> {
 
             // Valor
             _SectionCard(
-              emoji: '\uD83C\uDF81',
+              icon: Icons.local_offer_outlined,
               title: '\u00BFCu\u00E1nto le das de yapa?',
               subtitle: 'Descuento que recibe tu cliente',
               child: Wrap(
@@ -228,7 +225,7 @@ class _CreateYapaScreenState extends State<CreateYapaScreen> {
 
             // Compra m\u00EDnima
             _SectionCard(
-              emoji: '\uD83D\uDED2',
+              icon: Icons.shopping_cart_outlined,
               title: '\u00BFCompra m\u00EDnima para aplicar?',
               subtitle: 'El cliente gasta al menos esta cantidad',
               child: Wrap(
@@ -244,9 +241,27 @@ class _CreateYapaScreenState extends State<CreateYapaScreen> {
 
             const SizedBox(height: 14),
 
+            // Cantidad
+            _SectionCard(
+              icon: Icons.format_list_numbered,
+              title: '¿Cuántos cupones emites?',
+              subtitle: 'Se descontará \$${(_selectedValue * _selectedQuantity).toStringAsFixed(2)} de tu saldo',
+              child: Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: _quantityOptions.map((q) => _buildChip(
+                  label: q == 1 ? '1 cupón' : '$q cupones',
+                  selected: _selectedQuantity == q,
+                  onTap: () => setState(() => _selectedQuantity = q),
+                )).toList(),
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
             // Audiencia
             _SectionCard(
-              emoji: '\uD83D\uDC65',
+              icon: Icons.people_outline,
               title: '\u00BFA qui\u00E9n va dirigida?',
               subtitle: 'Elige qu\u00E9 clientes la reciben',
               child: Column(
@@ -284,9 +299,9 @@ class _CreateYapaScreenState extends State<CreateYapaScreen> {
                     children: [
                       _summaryItem('Descuento', '\$${_selectedValue.toStringAsFixed(2)}'),
                       Container(width: 1, height: 36, color: Colors.grey.shade200),
-                      _summaryItem('M\u00EDnimo', '\$${_selectedMinPurchase.toStringAsFixed(2)}'),
+                      _summaryItem('Cantidad', '$_selectedQuantity'),
                       Container(width: 1, height: 36, color: Colors.grey.shade200),
-                      _summaryItem('Para', _audiences.firstWhere((a) => a.id == _selectedAudience).label),
+                      _summaryItem('Total', '\$${(_selectedValue * _selectedQuantity).toStringAsFixed(2)}'),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -439,13 +454,13 @@ class _AudienceOption {
 }
 
 class _SectionCard extends StatelessWidget {
-  final String emoji;
+  final IconData icon;
   final String title;
   final String subtitle;
   final Widget child;
 
   const _SectionCard({
-    required this.emoji,
+    required this.icon,
     required this.title,
     required this.subtitle,
     required this.child,
@@ -461,7 +476,7 @@ class _SectionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -472,23 +487,35 @@ class _SectionCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 20)),
-              const SizedBox(width: 10),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4A1587).withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: const Color(0xFF4A1587), size: 18),
+              ),
+              const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF333333),
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1A1A1A),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(subtitle, style: const TextStyle(color: Colors.black45, fontSize: 12)),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(subtitle, style: const TextStyle(color: Colors.black45, fontSize: 13)),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           child,
         ],
       ),

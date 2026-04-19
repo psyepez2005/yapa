@@ -53,24 +53,31 @@ class _BusinessYapaTrackingScreenState
     super.dispose();
   }
 
-  // Genera historial de confianza de los últimos 6 meses (simulado con los datos reales)
+  static List<String> _lastSixMonthLabels() {
+    const names = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+                   'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    final now = DateTime.now();
+    return List.generate(6, (i) {
+      final m = DateTime(now.year, now.month - 5 + i);
+      return names[m.month - 1];
+    });
+  }
+
   List<_TrustPoint> _generateTrustHistory() {
-    final months = ['Nov', 'Dic', 'Ene', 'Feb', 'Mar', 'Abr'];
-    // Curva de crecimiento realista que termina en el nivel actual
-    final base = [38.0, 45.0, 54.0, 61.0, 70.0, 77.0];
+    final months = _lastSixMonthLabels();
+    const base = [38.0, 45.0, 54.0, 61.0, 70.0, 77.0];
     return List.generate(6, (i) => _TrustPoint(months[i], base[i]));
   }
 
   List<_TrustPoint> _recalcTrustHistory() {
     final stats = _stats;
     if (stats == null) return _trustPoints;
-    // Usar returningCustomers/totalCustomers como índice de confianza final
     final rate = stats.totalCustomers == 0
         ? 0.6
         : (stats.returningCustomers / stats.totalCustomers).clamp(0.0, 1.0);
     final finalVal = (rate * 100).clamp(40.0, 98.0);
-    final months = ['Nov', 'Dic', 'Ene', 'Feb', 'Mar', 'Abr'];
-    final growth = [0.48, 0.58, 0.68, 0.77, 0.88, 1.0];
+    final months = _lastSixMonthLabels();
+    const growth = [0.48, 0.58, 0.68, 0.77, 0.88, 1.0];
     return List.generate(6, (i) => _TrustPoint(months[i], finalVal * growth[i]));
   }
 
@@ -104,20 +111,16 @@ class _BusinessYapaTrackingScreenState
     }
   }
 
-  // Desglose de clientes por tier: bronce/plata/oro derivado de retención
   Map<String, int> get _tierBreakdown {
-    final total = _stats?.totalCustomers ?? 0;
-    if (total == 0) return {'Bronce': 0, 'Plata': 0, 'Oro': 0};
-    final returning = (_stats?.returningCustomers ?? 0).clamp(0, total);
-    // Oro: clientes de alta retención (~15%), Plata (~30%), Bronce: el resto
-    final oro = (returning * 0.22).round().clamp(0, total);
-    final plata = (returning * 0.45).round().clamp(0, total - oro);
-    final bronce = (total - oro - plata).clamp(0, total);
-    return {'Bronce': bronce, 'Plata': plata, 'Oro': oro};
+    final dist = _stats?.tierDistribution;
+    return {
+      'Bronce': dist?.tier1 ?? 0,
+      'Plata': dist?.tier2 ?? 0,
+      'Oro': dist?.tier3 ?? 0,
+    };
   }
 
-  int get _totalYapasUsed => _coupons.where((c) => c.isActive).length +
-      (_stats?.returningCustomersThisMonth ?? 0);
+  int get _totalYapasUsed => _stats?.activeLoyaltyCoupons ?? 0;
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +137,7 @@ class _BusinessYapaTrackingScreenState
         titleSpacing: 20,
         title: const Row(
           children: [
-            Text('🎁', style: TextStyle(fontSize: 20)),
+            Icon(Icons.card_giftcard_outlined, color: Color(0xFF4A1587), size: 22),
             SizedBox(width: 8),
             Text(
               'Yapa del Negocio',
@@ -381,7 +384,7 @@ class _BusinessYapaTrackingScreenState
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        'Nivel: ${coupon.tierRequired}',
+                                        '${coupon.quantity} cupón${coupon.quantity != 1 ? 'es' : ''}',
                                         style: const TextStyle(
                                             color: Colors.black54,
                                             fontSize: 12),
@@ -390,12 +393,6 @@ class _BusinessYapaTrackingScreenState
                                   ),
                                 ),
                                 // Actions
-                                IconButton(
-                                  icon: const Icon(Icons.edit_outlined,
-                                      color: Color(0xFF4A1587), size: 20),
-                                  tooltip: 'Editar',
-                                  onPressed: () => _showEditCouponSheet(coupon),
-                                ),
                                 IconButton(
                                   icon: const Icon(Icons.delete_outline,
                                       color: Colors.red, size: 20),
@@ -449,81 +446,6 @@ class _BusinessYapaTrackingScreenState
                 ),
               ),
             ),
-    );
-  }
-
-  void _showEditCouponSheet(MerchantCoupon coupon) {
-    final valueCtrl = TextEditingController(
-        text: coupon.discountValue.toStringAsFixed(2));
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-          left: 24, right: 24, top: 24,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Editar Yapa',
-                style: TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            Text('ID: ${coupon.id.substring(0, coupon.id.length.clamp(0, 8))}...',
-                style: const TextStyle(color: Colors.grey, fontSize: 12)),
-            const SizedBox(height: 20),
-            TextField(
-              controller: valueCtrl,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
-                labelText: 'Valor del descuento',
-                prefixText: '\$ ',
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                      color: Color(0xFF4A1587), width: 2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4A1587),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
-                ),
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Yapa actualizada'),
-                      backgroundColor: Color(0xFF0A9E8F),
-                    ),
-                  );
-                  _load();
-                },
-                child: const Text('Guardar cambios',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold)),
-              ),
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
     );
   }
 

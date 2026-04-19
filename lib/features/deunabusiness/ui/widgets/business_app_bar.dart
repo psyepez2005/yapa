@@ -1,20 +1,28 @@
 import 'package:flutter/material.dart';
 
 class BusinessAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String greeting;
-  final String subtitle;
+  final String merchantName;
+  final VoidCallback? onLogout;
 
   const BusinessAppBar({
     super.key,
-    this.greeting = 'Hola, Comerciante',
-    this.subtitle = 'deuna! Negocios',
+    this.merchantName = '',
+    this.onLogout,
   });
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
+  String get _greeting {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Buenos días';
+    if (hour < 18) return 'Buenas tardes';
+    return 'Buenas noches';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final displayName = merchantName.isNotEmpty ? merchantName : 'Comerciante';
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
@@ -32,33 +40,57 @@ class BusinessAppBar extends StatelessWidget implements PreferredSizeWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            greeting,
+            '$_greeting, $displayName',
             style: const TextStyle(
               color: Colors.black,
-              fontSize: 15,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
             overflow: TextOverflow.ellipsis,
           ),
           Text(
-            subtitle,
+            'deuna! Negocios',
             style: TextStyle(color: Colors.grey.shade500, fontSize: 11),
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
       actions: [
         IconButton(
           icon: const Icon(Icons.notifications_none, color: Colors.black87),
+          tooltip: 'Notificaciones',
           onPressed: () {},
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(minWidth: 40),
         ),
-        IconButton(
-          icon: const Icon(Icons.headset_mic_outlined, color: Colors.black87),
-          onPressed: () {},
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(minWidth: 40),
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert, color: Colors.black87),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          onSelected: (value) {
+            if (value == 'logout' && onLogout != null) onLogout!();
+          },
+          itemBuilder: (_) => [
+            const PopupMenuItem(
+              value: 'support',
+              child: Row(
+                children: [
+                  Icon(Icons.headset_mic_outlined, color: Color(0xFF4A1587), size: 20),
+                  SizedBox(width: 12),
+                  Text('Soporte'),
+                ],
+              ),
+            ),
+            const PopupMenuDivider(),
+            const PopupMenuItem(
+              value: 'logout',
+              child: Row(
+                children: [
+                  Icon(Icons.logout, color: Colors.red, size: 20),
+                  SizedBox(width: 12),
+                  Text('Cerrar sesión', style: TextStyle(color: Colors.red)),
+                ],
+              ),
+            ),
+          ],
         ),
         const SizedBox(width: 4),
       ],

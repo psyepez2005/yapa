@@ -53,6 +53,7 @@ class MerchantService {
     required double minimumPurchase,
     required String code,
     required String expiresAt,
+    int quantity = 1,
   }) async {
     try {
       final dio = await ApiClient.merchantAuthorized();
@@ -62,6 +63,7 @@ class MerchantService {
         'minimumPurchase': minimumPurchase,
         'code': code,
         'expiresAt': expiresAt,
+        'quantity': quantity,
       });
       final body = response.data;
       final data = (body is Map ? body['data'] : body) as Map<String, dynamic>;
