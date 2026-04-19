@@ -4,6 +4,9 @@ import 'package:yapa/features/auth/ui/screens/login_screen.dart';
 import 'package:yapa/features/deunabusiness/ui/screens/business_mockup_screen.dart';
 import '../../features/deunamockup/ui/screens/mockup_home_screen.dart';
 import '../../features/deunamockup/ui/screens/mockup_qr_scanner_screen.dart';
+import '../../features/deunamockup/ui/screens/mockup_payment_amount_screen.dart';
+import '../../features/deunamockup/ui/screens/mockup_payment_confirmation_screen.dart';
+import '../../features/deunamockup/ui/screens/mockup_payment_receipt_screen.dart';
 import '../../features/loyalty/ui/screens/loyalty_dashboard_screen.dart';
 import '../../features/loyalty/ui/screens/business_detail_screen.dart';
 
@@ -39,14 +42,28 @@ class AppRouter {
         name: 'qr_scanner',
         builder: (context, state) => const MockupQrScannerScreen(),
       ),
-
-      // ✅ 2. AGREGAR ESTA RUTA PARA LAS YAPAS
       GoRoute(
-        path: '/my-yapas',
-        name: 'my_yapas',
-        builder: (context, state) => const MyYapasScreen(),
+        path: '/payment-amount',
+        name: 'payment_amount',
+        builder: (context, state) => const MockupPaymentAmountScreen(),
       ),
-
+      GoRoute(
+        path: '/payment-confirmation/:amount',
+        name: 'payment_confirmation',
+        builder: (context, state) {
+          final amount = state.pathParameters['amount'] ?? '0.00';
+          return MockupPaymentConfirmationScreen(amount: amount);
+        },
+      ),
+      GoRoute(
+        path: '/payment-receipt/:amount/:yapa',
+        name: 'payment_receipt',
+        builder: (context, state) {
+          final amount = state.pathParameters['amount'] ?? '0.00';
+          final yapa = state.pathParameters['yapa'] ?? 'NINGUNA';
+          return MockupPaymentReceiptScreen(amount: amount, usedYapa: yapa);
+        },
+      ),
       // ✅ Pantalla de detalle conservada de la rama HEAD
       GoRoute(
         path: '/business-detail',

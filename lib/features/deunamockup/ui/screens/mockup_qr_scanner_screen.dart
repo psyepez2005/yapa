@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-class MockupQrScannerScreen extends StatelessWidget {
+import 'package:go_router/go_router.dart';class MockupQrScannerScreen extends StatelessWidget {
   const MockupQrScannerScreen({super.key});
 
   // Este es el método que crea la ventana emergente
@@ -54,7 +53,7 @@ class MockupQrScannerScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pop(); // Cierra el modal
-                      // TODO: Aquí podrías redirigir a una pantalla de "Ingresar monto"
+                      context.pushNamed('payment_amount'); // Nueva redirección
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF4A1587),
@@ -172,23 +171,30 @@ class MockupQrScannerScreen extends StatelessWidget {
                   bottom: 40,
                   left: 24,
                   right: 24,
-                  child: Column(
-                    children: [
-                      _BottomActionButton(
-                        iconWidget: const Text(
-                          '123', 
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)
-                        ),
-                        text: 'Pagar con código único',
-                        onTap: () {},
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: () => _showSimulatedScanDialog(context),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+                          if (states.contains(MaterialState.hovered) || states.contains(MaterialState.pressed)) {
+                            return const Color(0xFF4A1587); // Morado hover
+                          }
+                          return Colors.white; // Blanco por defecto
+                        }),
+                        foregroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+                          if (states.contains(MaterialState.hovered) || states.contains(MaterialState.pressed)) {
+                            return Colors.white;
+                          }
+                          return const Color(0xFF4A1587);
+                        }),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+                        elevation: MaterialStateProperty.all(2),
+                        overlayColor: MaterialStateProperty.all(Colors.transparent),
                       ),
-                      const SizedBox(height: 16),
-                      _BottomActionButton(
-                        iconWidget: const Icon(Icons.person_outline, color: Colors.white, size: 24),
-                        text: 'Pagar a un contacto',
-                        onTap: () {},
-                      ),
-                    ],
+                      child: const Text('Continuar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
                   ),
                 ),
               ],
@@ -226,43 +232,7 @@ class _TopControlButton extends StatelessWidget {
   }
 }
 
-class _BottomActionButton extends StatelessWidget {
-  final Widget iconWidget;
-  final String text;
-  final VoidCallback onTap;
 
-  const _BottomActionButton({required this.iconWidget, required this.text, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: const Color(0xFF2A2A2A), 
-      borderRadius: BorderRadius.circular(20),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: onTap,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-          child: Row(
-            children: [
-              iconWidget,
-              const SizedBox(width: 16),
-              Text(
-                text,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class _QrCornerPainter extends CustomPainter {
   final Color color;
