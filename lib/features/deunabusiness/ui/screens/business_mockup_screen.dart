@@ -9,6 +9,7 @@ import '../widgets/business_tab_bar.dart';
 import '../widgets/cobrar_view.dart';
 import '../widgets/qr_view.dart';
 import '../widgets/gestionar_view.dart';
+import 'business_yapa_tracking_screen.dart';
 
 export '../widgets/cobrar_view.dart' show CobrarMode;
 
@@ -28,6 +29,7 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
   MerchantStats? _stats;
   List<MerchantCoupon> _coupons = [];
   bool _loadingStats = false;
+  int _navIndex = 0;
   bool _loyaltyEnabled = true;
   bool _togglingLoyalty = false;
 
@@ -376,17 +378,50 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
                     onRefresh: _loadStats,
                     onTopUp: _showTopUpModal,
                     onCreateCoupon: _showCreateCouponModal,
+                    onNavigateToYapa: () {
+                      setState(() => _navIndex = 2);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const BusinessYapaTrackingScreen(),
+                        ),
+                      );
+                    },
                   ),
           ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _navIndex,
         selectedItemColor: const Color(0xFF4A1587),
         unselectedItemColor: Colors.grey,
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+        onTap: (index) {
+          if (index == 2) {
+            // Tab Yapa → navega a la pantalla de Trazabilidad
+            Navigator.of(context)
+                .push(
+                  MaterialPageRoute(
+                    builder: (_) => const BusinessYapaTrackingScreen(),
+                  ),
+                )
+                .then((_) => setState(() => _navIndex = 0));
+          } else {
+            setState(() {
+              _navIndex = index;
+              if (index == 0) {
+                _currentTab = 0;
+                _showQR = false;
+                _cobrarMode = CobrarMode.qr;
+              } else if (index == 1) {
+                _currentTab = 1;
+                if (_stats == null) _loadStats();
+              }
+            });
+          }
+        },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
           BottomNavigationBarItem(icon: Icon(Icons.point_of_sale), label: 'Mi Caja'),
