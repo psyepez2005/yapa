@@ -35,6 +35,7 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
   void initState() {
     super.initState();
     _loadMerchantId();
+    _loadStats();
   }
 
   Future<void> _loadMerchantId() async {
@@ -341,6 +342,7 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
                     ? QRView(
                         amount: _amount,
                         merchantId: _merchantId,
+                        merchantName: _stats?.merchantName,
                         continueLabel: _cobrarMode == CobrarMode.manual
                             ? 'Nuevo Cobro'
                             : 'Continuar para Cobrar',
@@ -393,4 +395,5 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
         ],
       ),
     );
+  }
 }

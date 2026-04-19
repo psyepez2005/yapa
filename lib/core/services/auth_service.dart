@@ -19,8 +19,14 @@ class AuthService {
         'phone': phone,
         'password': password,
       });
-      final token = response.data['data']['accessToken'] as String;
-      await TokenStorage.saveUserToken(token);
+      final data = response.data['data'] as Map<String, dynamic>;
+      final token = data['accessToken'] as String;
+      final fullName = data['fullName'] as String?;
+      
+      await Future.wait([
+        TokenStorage.saveUserToken(token),
+        if (fullName != null) TokenStorage.saveUserName(fullName),
+      ]);
     } on DioException catch (e) {
       throw AuthException(_extractMessage(e));
     }
@@ -40,7 +46,10 @@ class AuthService {
         if (email != null && email.isNotEmpty) 'email': email,
       });
       final token = response.data['data']['accessToken'] as String;
-      await TokenStorage.saveUserToken(token);
+      await Future.wait([
+        TokenStorage.saveUserToken(token),
+        TokenStorage.saveUserName(fullName),
+      ]);
     } on DioException catch (e) {
       throw AuthException(_extractMessage(e));
     }

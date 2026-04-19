@@ -4,6 +4,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 class QRView extends StatelessWidget {
   final String amount;
   final String? merchantId;
+  final String? merchantName;
   final VoidCallback onContinue;
   /// Label for the bottom action button (changes with cobrar mode)
   final String continueLabel;
@@ -12,6 +13,7 @@ class QRView extends StatelessWidget {
     super.key,
     required this.amount,
     required this.merchantId,
+    this.merchantName,
     required this.onContinue,
     this.continueLabel = 'Continuar para Cobrar',
   });
@@ -52,7 +54,7 @@ class QRView extends StatelessWidget {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: QrImageView(
-                            data: 'deuna://merchant/$merchantId?amount=$amount',
+                            data: 'deuna://merchant/$merchantId?amount=$amount&name=${Uri.encodeComponent(merchantName ?? '')}',
                             version: QrVersions.auto,
                             size: 250,
                             backgroundColor: Colors.white,
