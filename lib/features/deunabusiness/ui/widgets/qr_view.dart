@@ -52,7 +52,7 @@ class QRView extends StatelessWidget {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: QrImageView(
-                            data: 'deuna://merchant/$merchantId',
+                            data: 'deuna://merchant/$merchantId?amount=$amount',
                             version: QrVersions.auto,
                             size: 250,
                             backgroundColor: Colors.white,

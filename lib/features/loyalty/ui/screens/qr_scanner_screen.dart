@@ -40,8 +40,9 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       _showError('QR inválido. No se encontró el ID del negocio.');
       return;
     }
+    final amountStr = uri.queryParameters['amount'];
     setState(() => _scanned = true);
-    _openAmountSheet(merchantId);
+    _openAmountSheet(merchantId, amountStr);
   }
 
   void _showError(String msg) {
@@ -51,13 +52,14 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
     );
   }
 
-  void _openAmountSheet(String merchantId) {
+  void _openAmountSheet(String merchantId, [String? prefillAmount]) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => ScanAmountSheet(
         merchantId: merchantId,
+        prefillAmount: prefillAmount,
         onDone: () {
           Navigator.of(context).pop();
           Navigator.of(context).pop();

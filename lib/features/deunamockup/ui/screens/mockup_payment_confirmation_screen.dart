@@ -195,7 +195,12 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
                     
                     // Block 1: Para
                     _buildListTile(
-                      iconWidget: Text(widget.merchantName.substring(0, 2).toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                      iconWidget: Text(
+                        widget.merchantName.length >= 2
+                            ? widget.merchantName.substring(0, 2).toUpperCase()
+                            : widget.merchantName.toUpperCase(),
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
                       iconColor: const Color(0xFF4A1587),
                       label: 'Para',
                       title: widget.merchantName,
@@ -261,7 +266,7 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
                           decoration: BoxDecoration(
                             color: const Color(0xFFF3E5F5),
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0xFF4A1587).withOpacity(0.3)),
+                            border: Border.all(color: const Color(0xFF4A1587).withValues(alpha: 0.3)),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

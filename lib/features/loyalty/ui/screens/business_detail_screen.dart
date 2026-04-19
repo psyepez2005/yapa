@@ -93,7 +93,6 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                     businessName: widget.businessName,
                     businessIcon: widget.businessIcon,
                     tierName: widget.tierName,
-                    cashbackPercentage: widget.cashbackPercentage,
                   ),
                   if (widget.activeYapas.isNotEmpty)
                     Padding(

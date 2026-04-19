@@ -36,7 +36,7 @@ class MockupHomeScreen extends StatelessWidget {
         height: 56,
         child: FloatingActionButton.extended(
           // ✅ ACÁ CONECTAMOS LA NAVEGACIÓN
-          onPressed: () => context.pushNamed('qr_scanner'), 
+          onPressed: () => context.pushNamed('mockup_scanner'),
           backgroundColor: const Color(0xFF4A1587),
           elevation: 2,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

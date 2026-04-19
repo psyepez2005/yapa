@@ -30,6 +30,8 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
   List<MerchantCoupon> _coupons = [];
   bool _loadingStats = false;
   int _navIndex = 0;
+  bool _loyaltyEnabled = true;
+  bool _togglingLoyalty = false;
 
   @override
   void initState() {
@@ -52,15 +54,37 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
         service.fetchCoupons(),
       ]);
       if (mounted) {
+        final stats = results[0] as MerchantStats;
         setState(() {
-          _stats = results[0] as MerchantStats;
+          _stats = stats;
           _coupons = results[1] as List<MerchantCoupon>;
+          _loyaltyEnabled = stats.loyaltyEnabled;
         });
       }
     } catch (_) {
       // Stats are informational — silently fall back to cached/empty
     } finally {
       if (mounted) setState(() => _loadingStats = false);
+    }
+  }
+
+  Future<void> _toggleLoyalty(bool enabled) async {
+    if (_togglingLoyalty) return;
+    setState(() {
+      _togglingLoyalty = true;
+      _loyaltyEnabled = enabled;
+    });
+    try {
+      await MerchantService().toggleLoyalty(enabled: enabled);
+    } on MerchantException catch (e) {
+      if (mounted) {
+        setState(() => _loyaltyEnabled = !enabled);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _togglingLoyalty = false);
     }
   }
 

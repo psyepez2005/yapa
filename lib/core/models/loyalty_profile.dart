@@ -36,6 +36,7 @@ class LoyaltyProfileEntry {
   final List<ActiveYapa> activeYapas;
   final int yapasCount;
   final double totalYapasValue;
+  final DateTime? degradationDueDate;
 
   const LoyaltyProfileEntry({
     required this.merchantId,
@@ -46,10 +47,12 @@ class LoyaltyProfileEntry {
     required this.activeYapas,
     required this.yapasCount,
     required this.totalYapasValue,
+    this.degradationDueDate,
   });
 
   factory LoyaltyProfileEntry.fromJson(Map<String, dynamic> json) {
     final yapasRaw = json['activeYapas'] as List? ?? [];
+    final degradationRaw = json['degradationDueDate'] as String?;
     return LoyaltyProfileEntry(
       merchantId: json['merchantId'] as String,
       merchantName: json['merchantName'] as String,
@@ -63,7 +66,19 @@ class LoyaltyProfileEntry {
           .toList(),
       yapasCount: json['yapasCount'] as int,
       totalYapasValue: (json['totalYapasValue'] as num).toDouble(),
+      degradationDueDate:
+          degradationRaw != null ? DateTime.tryParse(degradationRaw) : null,
     );
+  }
+
+  int? get degradationRiskDays {
+    if (degradationDueDate == null) return null;
+    return degradationDueDate!.difference(DateTime.now()).inDays;
+  }
+
+  bool get isDegradationRisk {
+    final days = degradationRiskDays;
+    return days != null && days <= 7 && days >= 0;
   }
 
   // ── Tier helpers ──────────────────────────────────────────────────────────

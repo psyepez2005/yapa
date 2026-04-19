@@ -76,9 +76,9 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            antifraudBlocked ? 'Pago bloqueado por prevención de fraude' : 'Tu dinero llegó al instante', 
-                            style: TextStyle(color: antifraudBlocked ? Colors.red : Colors.grey, fontSize: 14, fontWeight: antifraudBlocked ? FontWeight.bold : FontWeight.normal),
+                          const Text(
+                            'Tu dinero llegó al instante',
+                            style: TextStyle(color: Colors.grey, fontSize: 14),
                           ),
                           const SizedBox(height: 24),
                           // Valor final cobrado
@@ -147,7 +147,28 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                           const SizedBox(height: 32),
                           
                           // Earned Pts & Yapa unlocking integration
-                          if (!antifraudBlocked)
+                          if (antifraudBlocked)
+                            Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 24),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF5F5F5),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.info_outline, color: Colors.grey, size: 18),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      'Esta compra no acumuló puntos de fidelización.',
+                                      style: TextStyle(color: Colors.grey, fontSize: 13),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          else
                             Container(
                               margin: const EdgeInsets.symmetric(horizontal: 24),
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -246,7 +267,7 @@ class MockupPaymentReceiptScreen extends StatelessWidget {
                           // De / Para section
                           _buildTransferParty(title: 'De', initials: 'TÚ', name: 'Tu Cuenta Deuna', subtext: 'Banco Pichincha ******6971', avatarColor: const Color(0xFFEAD8F7)),
                           const SizedBox(height: 16),
-                          _buildTransferParty(title: 'Para', initials: merchantName.substring(0, 2).toUpperCase(), name: merchantName, subtext: 'Cobro por escáner de pagos', avatarColor: const Color(0xFFEAD8F7)),
+                          _buildTransferParty(title: 'Para', initials: merchantName.length >= 2 ? merchantName.substring(0, 2).toUpperCase() : merchantName.toUpperCase(), name: merchantName, subtext: 'Cobro por escáner de pagos', avatarColor: const Color(0xFFEAD8F7)),
                           
                           const SizedBox(height: 24),
                           // Buttons
