@@ -1,7 +1,10 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class TokenStorage {
-  static const _storage = FlutterSecureStorage();
+  static const _storage = FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    wOptions: WindowsOptions(),
+  );
 
   static const _userTokenKey = 'user_access_token';
   static const _merchantTokenKey = 'merchant_access_token';
