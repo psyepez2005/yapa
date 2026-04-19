@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:yapa/core/storage/token_storage.dart';
 
 class BusinessMockupScreen extends StatefulWidget {
   const BusinessMockupScreen({super.key});
@@ -8,9 +10,21 @@ class BusinessMockupScreen extends StatefulWidget {
 }
 
 class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
-  int _currentTab = 0; // 0 for Cobrar, 1 for Gestionar
+  int _currentTab = 0;
   String _amount = '';
   bool _showQR = false;
+  String? _merchantId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMerchantId();
+  }
+
+  Future<void> _loadMerchantId() async {
+    final id = await TokenStorage.getMerchantId();
+    if (mounted) setState(() => _merchantId = id);
+  }
 
   void _onKeypadTap(String key) {
     setState(() {
@@ -220,25 +234,46 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.grey.shade200),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 5))
-                ],
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  const Icon(Icons.qr_code_2, size: 220, color: Colors.black),
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text('d!', style: TextStyle(color: Color(0xFF4A1587), fontWeight: FontWeight.bold, fontSize: 24)),
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
                   ),
                 ],
               ),
+              child: _merchantId == null
+                  ? const Center(child: CircularProgressIndicator(color: Color(0xFF4A1587)))
+                  : Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: QrImageView(
+                            data: 'deuna://merchant/$_merchantId',
+                            version: QrVersions.auto,
+                            size: 250,
+                            backgroundColor: Colors.white,
+                          ),
+                        ),
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'd!',
+                            style: TextStyle(
+                              color: Color(0xFF4A1587),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
             ),
             const SizedBox(height: 24),
             
@@ -335,7 +370,7 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.grey.shade200),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))
                 ],
               ),
               child: Row(
@@ -470,7 +505,7 @@ class _BusinessMockupScreenState extends State<BusinessMockupScreen> {
               color: Colors.white,
               border: Border.all(color: Colors.grey.shade100),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.01), blurRadius: 4, offset: const Offset(0, 2))
+                BoxShadow(color: Colors.black.withValues(alpha: 0.01), blurRadius: 4, offset: const Offset(0, 2))
               ]
             ),
             child: Icon(icon, color: Colors.black87, size: 24),

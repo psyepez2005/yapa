@@ -5,8 +5,8 @@ import 'package:yapa/features/auth/ui/screens/user_login_screen.dart';
 import 'package:yapa/features/auth/ui/screens/merchant_login_screen.dart';
 import 'package:yapa/features/deunabusiness/ui/screens/business_mockup_screen.dart';
 import 'package:yapa/features/loyalty/ui/screens/my_yapas_screen.dart';
+import 'package:yapa/features/loyalty/ui/screens/qr_scanner_screen.dart';
 import '../../features/deunamockup/ui/screens/mockup_home_screen.dart';
-import '../../features/deunamockup/ui/screens/mockup_qr_scanner_screen.dart';
 import '../../features/loyalty/ui/screens/loyalty_dashboard_screen.dart';
 import '../../features/loyalty/ui/screens/business_detail_screen.dart';
 
@@ -47,7 +47,7 @@ class AppRouter {
       GoRoute(
         path: '/qr-scanner',
         name: 'qr_scanner',
-        builder: (context, state) => const MockupQrScannerScreen(),
+        builder: (context, state) => const QrScannerScreen(),
       ),
       GoRoute(
         path: '/my-yapas',
