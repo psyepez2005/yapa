@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
-import 'package:flutter/material.dart';
 import 'package:yapa/features/auth/ui/screens/login_screen.dart';
+import 'package:yapa/features/auth/ui/screens/user_login_screen.dart';
+import 'package:yapa/features/auth/ui/screens/merchant_login_screen.dart';
 import 'package:yapa/features/deunabusiness/ui/screens/business_mockup_screen.dart';
 import '../../features/deunamockup/ui/screens/mockup_home_screen.dart';
 import '../../features/deunamockup/ui/screens/mockup_qr_scanner_screen.dart';
@@ -15,6 +16,16 @@ class AppRouter {
         path: '/',
         name: 'login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/login/user',
+        name: 'user_login',
+        builder: (context, state) => const UserLoginScreen(),
+      ),
+      GoRoute(
+        path: '/login/merchant',
+        name: 'merchant_login',
+        builder: (context, state) => const MerchantLoginScreen(),
       ),
       GoRoute(
         path: '/business',

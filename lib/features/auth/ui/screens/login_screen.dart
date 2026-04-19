@@ -113,10 +113,7 @@ class LoginScreen extends StatelessWidget {
                     width: double.infinity,
                     height: 54,
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Navegar al Dashboard general
-                        context.go('/mockup');
-                      },
+                      onPressed: () => context.go('/login/user'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF4A1587),
                         shape: RoundedRectangleBorder(
@@ -128,7 +125,7 @@ class LoginScreen extends StatelessWidget {
                         'Ingresar a Deuna',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.bold, 
+                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
@@ -139,12 +136,9 @@ class LoginScreen extends StatelessWidget {
                     width: double.infinity,
                     height: 54,
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Navegar al Dashboard de Lealtad (Business POS)
-                        context.go('/business');
-                      },
+                      onPressed: () => context.go('/login/merchant'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0A9E8F), // Verde azulado / turquesa de la imagen
+                        backgroundColor: const Color(0xFF0A9E8F),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),
                         ),
@@ -154,7 +148,7 @@ class LoginScreen extends StatelessWidget {
                         'Ingresar a DeunaBusiness',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.bold, 
+                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
