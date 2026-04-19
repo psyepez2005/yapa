@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MockupBottomNav extends StatelessWidget {
   final int currentIndex;
 
   const MockupBottomNav({
-    super.key, 
-    this.currentIndex = 1, // Por defecto en 1 (Beneficios) como en tu foto
+    super.key,
+    this.currentIndex = 0,
   });
 
   @override
@@ -19,32 +20,55 @@ class MockupBottomNav extends StatelessWidget {
       ),
       child: BottomNavigationBar(
         currentIndex: currentIndex,
-        type: BottomNavigationBarType.fixed, // Evita que los íconos salten
+        type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF4A1587), // Morado DeUna
-        unselectedItemColor: const Color(0xFF757575), // Gris
+        selectedItemColor: const Color(0xFF4A1587),
+        unselectedItemColor: const Color(0xFF757575),
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
         elevation: 0,
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              if (currentIndex != 0) context.go('/mockup');
+              break;
+            case 1:
+              if (currentIndex != 1) context.go('/loyalty');
+              break;
+            case 2:
+            case 3:
+              // Wallet y perfil: decorativo por ahora
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Próximamente disponible'),
+                  behavior: SnackBarBehavior.floating,
+                  backgroundColor: const Color(0xFF4A1587),
+                  duration: const Duration(seconds: 1),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              );
+              break;
+          }
+        },
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined), 
-            activeIcon: Icon(Icons.home), 
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
             label: 'Inicio',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.card_giftcard_outlined), 
-            activeIcon: Icon(Icons.card_giftcard), 
+            icon: Icon(Icons.card_giftcard_outlined),
+            activeIcon: Icon(Icons.card_giftcard),
             label: 'Beneficios',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet_outlined), 
-            activeIcon: Icon(Icons.account_balance_wallet), 
+            icon: Icon(Icons.account_balance_wallet_outlined),
+            activeIcon: Icon(Icons.account_balance_wallet),
             label: 'Billetera',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline), 
-            activeIcon: Icon(Icons.person), 
+            icon: Icon(Icons.person_outline),
+            activeIcon: Icon(Icons.person),
             label: 'Tú',
           ),
         ],

@@ -1,7 +1,12 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
+/// Abstracción de almacenamiento que usa localStorage en web
+/// y flutter_secure_storage en móvil/escritorio.
 class TokenStorage {
-  static const _storage = FlutterSecureStorage(
+  static const _secureStorage = FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
     wOptions: WindowsOptions(),
   );
@@ -11,35 +16,59 @@ class TokenStorage {
   static const _merchantTokenKey = 'merchant_access_token';
   static const _merchantIdKey = 'merchant_id';
 
-  static Future<void> saveUserToken(String token) =>
-      _storage.write(key: _userTokenKey, value: token);
+  // ── Escritura ──────────────────────────────────────────────────────────────
 
-  static Future<void> saveUserName(String name) =>
-      _storage.write(key: _userNameKey, value: name);
+  static Future<void> saveUserToken(String token) => _write(_userTokenKey, token);
+  static Future<void> saveUserName(String name) => _write(_userNameKey, name);
+  static Future<void> saveMerchantToken(String token) => _write(_merchantTokenKey, token);
+  static Future<void> saveMerchantId(String id) => _write(_merchantIdKey, id);
 
-  static Future<String?> getUserToken() =>
-      _storage.read(key: _userTokenKey);
+  // ── Lectura ───────────────────────────────────────────────────────────────
 
-  static Future<void> saveMerchantToken(String token) =>
-      _storage.write(key: _merchantTokenKey, value: token);
+  static Future<String?> getUserToken() => _read(_userTokenKey);
+  static Future<String?> getUserName() => _read(_userNameKey);
+  static Future<String?> getMerchantToken() => _read(_merchantTokenKey);
+  static Future<String?> getMerchantId() => _read(_merchantIdKey);
 
-  static Future<String?> getUserName() =>
-      _storage.read(key: _userNameKey);
+  // ── Eliminación ───────────────────────────────────────────────────────────
 
-  static Future<String?> getMerchantToken() =>
-      _storage.read(key: _merchantTokenKey);
+  static Future<void> clearUserToken() => _delete(_userTokenKey);
+  static Future<void> clearMerchantToken() => _delete(_merchantTokenKey);
 
-  static Future<void> saveMerchantId(String id) =>
-      _storage.write(key: _merchantIdKey, value: id);
+  static Future<void> clearAll() async {
+    if (kIsWeb) {
+      html.window.localStorage.remove(_userTokenKey);
+      html.window.localStorage.remove(_userNameKey);
+      html.window.localStorage.remove(_merchantTokenKey);
+      html.window.localStorage.remove(_merchantIdKey);
+    } else {
+      await _secureStorage.deleteAll();
+    }
+  }
 
-  static Future<String?> getMerchantId() =>
-      _storage.read(key: _merchantIdKey);
+  // ── Helpers internos ──────────────────────────────────────────────────────
 
-  static Future<void> clearUserToken() =>
-      _storage.delete(key: _userTokenKey);
+  static Future<void> _write(String key, String value) async {
+    if (kIsWeb) {
+      html.window.localStorage[key] = value;
+    } else {
+      await _secureStorage.write(key: key, value: value);
+    }
+  }
 
-  static Future<void> clearMerchantToken() =>
-      _storage.delete(key: _merchantTokenKey);
+  static Future<String?> _read(String key) async {
+    if (kIsWeb) {
+      return html.window.localStorage[key];
+    } else {
+      return await _secureStorage.read(key: key);
+    }
+  }
 
-  static Future<void> clearAll() => _storage.deleteAll();
+  static Future<void> _delete(String key) async {
+    if (kIsWeb) {
+      html.window.localStorage.remove(key);
+    } else {
+      await _secureStorage.delete(key: key);
+    }
+  }
 }

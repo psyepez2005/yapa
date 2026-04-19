@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../widgets/mockup_app_bar.dart';
 import '../widgets/mockup_balance_card.dart';
+import '../widgets/mockup_yapas_card.dart';
 import '../widgets/mockup_service_grid.dart';
 import '../widgets/mockup_promo_carousel.dart';
 import '../widgets/mockup_bottom_nav.dart';
@@ -14,17 +15,19 @@ class MockupHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
-      appBar: const MockupAppBar(), // Widget extraído
+      appBar: const MockupAppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 100.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
             MockupBalanceCard(),
+            SizedBox(height: 16.0),
+            MockupYapasCard(),
             SizedBox(height: 24.0),
             MockupServiceGrid(),
             SizedBox(height: 32.0),
-            MockupPromoCarousel(), // <-- Aquí agregamos el carrusel
+            MockupPromoCarousel(),
           ],
         ),
       ),

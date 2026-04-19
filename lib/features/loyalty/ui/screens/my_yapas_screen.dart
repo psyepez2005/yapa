@@ -1,16 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:yapa/core/models/loyalty_profile.dart';
+import 'package:yapa/core/services/loyalty_service.dart';
 
-class MyYapasScreen extends StatelessWidget {
+class MyYapasScreen extends StatefulWidget {
   final List<LoyaltyProfileEntry> entries;
 
-  const MyYapasScreen({super.key, required this.entries});
+  const MyYapasScreen({super.key, this.entries = const []});
+
+  @override
+  State<MyYapasScreen> createState() => _MyYapasScreenState();
+}
+
+class _MyYapasScreenState extends State<MyYapasScreen> {
+  late List<LoyaltyProfileEntry> _entries;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _entries = widget.entries;
+    // Si llegamos sin datos (navegación directa), los cargamos del back
+    if (_entries.isEmpty) _loadFromBackend();
+  }
+
+  Future<void> _loadFromBackend() async {
+    setState(() => _isLoading = true);
+    try {
+      final data = await LoyaltyService().fetchProfile();
+      if (mounted) setState(() => _entries = data);
+    } catch (_) {
+      // silently fail — empty state is shown
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   List<LoyaltyProfileEntry> get _withYapas =>
-      entries.where((e) => e.activeYapas.isNotEmpty).toList();
+      _entries.where((e) => e.activeYapas.isNotEmpty).toList();
 
   double get _totalValue =>
-      entries.fold(0.0, (sum, e) => sum + e.totalYapasValue);
+      _entries.fold(0.0, (sum, e) => sum + e.totalYapasValue);
 
   @override
   Widget build(BuildContext context) {
@@ -33,22 +62,24 @@ class MyYapasScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: _withYapas.isEmpty
-          ? _buildEmptyState(context)
-          : Column(
-              children: [
-                _buildTotalBanner(),
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _withYapas.length,
-                    itemBuilder: (_, i) => _MerchantYapaGroup(
-                      entry: _withYapas[i],
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF4A1587)))
+          : _withYapas.isEmpty
+              ? _buildEmptyState(context)
+              : Column(
+                  children: [
+                    _buildTotalBanner(),
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: _withYapas.length,
+                        itemBuilder: (_, i) => _MerchantYapaGroup(
+                          entry: _withYapas[i],
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
     );
   }
 
@@ -147,6 +178,7 @@ class MyYapasScreen extends StatelessWidget {
     );
   }
 }
+
 
 class _MerchantYapaGroup extends StatelessWidget {
   final LoyaltyProfileEntry entry;
