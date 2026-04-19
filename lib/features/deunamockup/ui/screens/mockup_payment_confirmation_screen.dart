@@ -24,10 +24,12 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
   List<ActiveYapa> _availableYapas = [];
   bool _isLoading = true;
   bool _isProcessing = false;
+  late String _realMerchantName;
 
   @override
   void initState() {
     super.initState();
+    _realMerchantName = widget.merchantName;
     _loadAvailableYapas();
   }
 
@@ -50,6 +52,9 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
       if (mounted) {
         setState(() {
           _availableYapas = entry.activeYapas;
+          if (entry.merchantName.isNotEmpty) {
+            _realMerchantName = entry.merchantName;
+          }
           _isLoading = false;
         });
       }
@@ -79,7 +84,7 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
           'payment_receipt',
           extra: {
             'amount': finalAmount.toStringAsFixed(2),
-            'merchantName': widget.merchantName,
+            'merchantName': _realMerchantName,
             'result': result,
           },
         );
@@ -196,14 +201,14 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
                     // Block 1: Para
                     _buildListTile(
                       iconWidget: Text(
-                        widget.merchantName.length >= 2
-                            ? widget.merchantName.substring(0, 2).toUpperCase()
-                            : widget.merchantName.toUpperCase(),
+                        _realMerchantName.length >= 2
+                            ? _realMerchantName.substring(0, 2).toUpperCase()
+                            : _realMerchantName.toUpperCase(),
                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       iconColor: const Color(0xFF4A1587),
                       label: 'Para',
-                      title: widget.merchantName,
+                      title: _realMerchantName,
                       subtitle: 'Banco Pichincha ******5424',
                     ),
                     const SizedBox(height: 24),
@@ -352,7 +357,6 @@ class _MockupPaymentConfirmationScreenState extends State<MockupPaymentConfirmat
                               '\$$displayOriginal', 
                               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey, decoration: TextDecoration.lineThrough)
                             ),
-                            const SizedBox(width: 8),
                             Text('\$$displayDiscounted', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF00BFA5))),
                           ],
                         )

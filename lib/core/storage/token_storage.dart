@@ -7,17 +7,24 @@ class TokenStorage {
   );
 
   static const _userTokenKey = 'user_access_token';
+  static const _userNameKey = 'user_full_name';
   static const _merchantTokenKey = 'merchant_access_token';
   static const _merchantIdKey = 'merchant_id';
 
   static Future<void> saveUserToken(String token) =>
       _storage.write(key: _userTokenKey, value: token);
 
-  static Future<void> saveMerchantToken(String token) =>
-      _storage.write(key: _merchantTokenKey, value: token);
+  static Future<void> saveUserName(String name) =>
+      _storage.write(key: _userNameKey, value: name);
 
   static Future<String?> getUserToken() =>
       _storage.read(key: _userTokenKey);
+
+  static Future<void> saveMerchantToken(String token) =>
+      _storage.write(key: _merchantTokenKey, value: token);
+
+  static Future<String?> getUserName() =>
+      _storage.read(key: _userNameKey);
 
   static Future<String?> getMerchantToken() =>
       _storage.read(key: _merchantTokenKey);

@@ -41,8 +41,24 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       return;
     }
     final amountStr = uri.queryParameters['amount'];
+    
+    const mockMerchantNames = {
+      'm001': 'Ceviches de la Ruleta',
+      '66952548-3805-41ff-b4fd-607572313c34': 'Ceviches de la Ruleta',
+      'm010': 'Jugos Naturales Pacheco',
+      '1a21ad8c-b447-4784-82a5-8c540ceeb38b': 'Jugos Naturales Pacheco',
+      'm020': 'Wok Chino Restaurante',
+      'c1a5924d-795f-4b82-8c0c-42875e76970c': 'Wok Chino Restaurante',
+      'm030': 'Tienda Escolar El Saber',
+      'f899d880-0f70-4fed-bd2a-2f75de599ef1': 'Tienda Escolar El Saber',
+    };
+    final nameParam = uri.queryParameters['name'];
+    final merchantName = (nameParam != null && nameParam.isNotEmpty) 
+        ? nameParam 
+        : (mockMerchantNames[merchantId] ?? 'Negocio');
+
     setState(() => _scanned = true);
-    _openAmountSheet(merchantId, amountStr);
+    _openAmountSheet(merchantId, amountStr, merchantName);
   }
 
   void _showError(String msg) {
@@ -52,7 +68,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
     );
   }
 
-  void _openAmountSheet(String merchantId, [String? prefillAmount]) {
+  void _openAmountSheet(String merchantId, [String? prefillAmount, String? merchantNameOverride]) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -60,6 +76,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       builder: (_) => ScanAmountSheet(
         merchantId: merchantId,
         prefillAmount: prefillAmount,
+        merchantNameOverride: merchantNameOverride,
         onDone: () {
           Navigator.of(context).pop();
           Navigator.of(context).pop();

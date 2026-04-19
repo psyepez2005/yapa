@@ -7,12 +7,14 @@ import 'package:yapa/features/loyalty/ui/widgets/scan_result_sheet.dart';
 class ScanAmountSheet extends StatefulWidget {
   final String merchantId;
   final String? prefillAmount;
+  final String? merchantNameOverride;
   final VoidCallback onDone;
 
   const ScanAmountSheet({
     super.key,
     required this.merchantId,
     this.prefillAmount,
+    this.merchantNameOverride,
     required this.onDone,
   });
 
@@ -24,7 +26,7 @@ class _ScanAmountSheetState extends State<ScanAmountSheet> {
   String _amount = '';
   String? _selectedCouponId;
   List<ActiveYapa> _yapas = [];
-  String _merchantName = 'Negocio';
+  late String _merchantName = widget.merchantNameOverride ?? 'Negocio';
   bool _submitting = false;
   bool _loadingYapas = true;
 
@@ -44,12 +46,18 @@ class _ScanAmountSheetState extends State<ScanAmountSheet> {
       if (mounted) {
         setState(() {
           _yapas = match?.activeYapas ?? [];
-          _merchantName = match?.merchantName ?? 'Negocio';
+          if (match?.merchantName != null) {
+            _merchantName = match!.merchantName;
+          }
           _loadingYapas = false;
         });
       }
     } catch (_) {
-      if (mounted) setState(() => _loadingYapas = false);
+      if (mounted) {
+        setState(() {
+          _loadingYapas = false;
+        });
+      }
     }
   }
 
