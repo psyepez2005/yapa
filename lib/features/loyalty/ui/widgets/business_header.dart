@@ -4,12 +4,14 @@ class BusinessHeader extends StatelessWidget {
   final String businessName;
   final IconData businessIcon;
   final String tierName;
+  final String? cashbackPercentage;
 
   const BusinessHeader({
     super.key,
     required this.businessName,
     required this.businessIcon,
     required this.tierName,
+    this.cashbackPercentage,
   });
 
   @override
@@ -30,7 +32,7 @@ class BusinessHeader extends StatelessWidget {
               color: Colors.white,
               shape: BoxShape.circle,
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5))
+                BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))
               ]
             ),
             child: Icon(businessIcon, color: const Color(0xFF4A1587), size: 40),
@@ -40,6 +42,24 @@ class BusinessHeader extends StatelessWidget {
             businessName,
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
           ),
+          if (cashbackPercentage != null) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFF00BFA5).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                '$cashbackPercentage cashback',
+                style: const TextStyle(
+                  color: Color(0xFF00897B),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           
           // ✅ EL NUEVO MENSAJE EDUCATIVO
