@@ -14,7 +14,8 @@ class LoyaltyBusinessCard extends StatefulWidget {
   final String nextLevel;
   final int purchasesNeeded;
   final IconData businessIcon;
-  final int currentYapas; // ✅ Cambiado a Yapas (0 a 5)
+  final int currentYapas;
+  final VoidCallback? onTap;
 
   const LoyaltyBusinessCard({
     super.key,
@@ -30,6 +31,7 @@ class LoyaltyBusinessCard extends StatefulWidget {
     required this.purchasesNeeded,
     required this.businessIcon,
     required this.currentYapas,
+    this.onTap,
   });
 
   @override
@@ -90,19 +92,18 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
               _isHovered = value;
             });
           },
-          onTap: () {
-            context.pushNamed(
-              'business_detail',
-              extra: {
-                'name': widget.businessName,
-                'icon': widget.businessIcon,
-                'tier': widget.tierName,
-                'cashback': widget.cashbackPercentage,
-                'currentPoints': widget.currentYapas, // Mandamos las yapas al router
-                'targetPoints': 5, // La meta siempre es 5
-              },
-            );
-          },
+          onTap: widget.onTap ??
+              () => context.pushNamed(
+                    'business_detail',
+                    extra: {
+                      'name': widget.businessName,
+                      'icon': widget.businessIcon,
+                      'tier': widget.tierName,
+                      'cashback': widget.cashbackPercentage,
+                      'currentPoints': widget.currentYapas,
+                      'targetPoints': 5,
+                    },
+                  ),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
