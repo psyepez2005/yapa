@@ -7,6 +7,9 @@ import '../../features/deunamockup/ui/screens/mockup_qr_scanner_screen.dart';
 import '../../features/loyalty/ui/screens/loyalty_dashboard_screen.dart';
 import '../../features/loyalty/ui/screens/business_detail_screen.dart';
 
+// ✅ 1. AGREGAR ESTA IMPORTACIÓN (Asegúrate de que el archivo exista en tus carpetas)
+import '../../features/loyalty/ui/screens/my_yapas_screen.dart'; 
+
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/', // Inicia en el Login según tus últimos cambios
@@ -36,6 +39,14 @@ class AppRouter {
         name: 'qr_scanner',
         builder: (context, state) => const MockupQrScannerScreen(),
       ),
+
+      // ✅ 2. AGREGAR ESTA RUTA PARA LAS YAPAS
+      GoRoute(
+        path: '/my-yapas',
+        name: 'my_yapas',
+        builder: (context, state) => const MyYapasScreen(),
+      ),
+
       // ✅ Pantalla de detalle conservada de la rama HEAD
       GoRoute(
         path: '/business-detail',

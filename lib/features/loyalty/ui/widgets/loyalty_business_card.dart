@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'yapa_step_indicator.dart'; // Asegúrate de que la ruta sea correcta
+import 'yapa_step_indicator.dart';
 
 class LoyaltyBusinessCard extends StatefulWidget {
   final String businessName;
@@ -14,7 +14,7 @@ class LoyaltyBusinessCard extends StatefulWidget {
   final String nextLevel;
   final int purchasesNeeded;
   final IconData businessIcon;
-  final int currentYapas; // ✅ Cambiado a Yapas (0 a 5)
+  final int currentYapas; 
 
   const LoyaltyBusinessCard({
     super.key,
@@ -43,7 +43,8 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
   @override
   Widget build(BuildContext context) {
     Color tierColor;
-    Color tierBgColor;
+    // La variable tierBgColor ya no se usa para el badge, pero la dejamos por si decides volver a usarla
+    Color tierBgColor; 
 
     switch (widget.tierName.toLowerCase()) {
       case 'oro':
@@ -98,8 +99,8 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                 'icon': widget.businessIcon,
                 'tier': widget.tierName,
                 'cashback': widget.cashbackPercentage,
-                'currentPoints': widget.currentYapas, // Mandamos las yapas al router
-                'targetPoints': 5, // La meta siempre es 5
+                'currentPoints': widget.currentYapas, 
+                'targetPoints': 5, 
               },
             );
           },
@@ -133,46 +134,25 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                             widget.businessName,
                             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
+                          // ✅ Solo mostramos la categoría (quitamos la ubicación)
                           Text(
-                            '${widget.category} · ${widget.location}',
+                            widget.category,
                             style: const TextStyle(color: Colors.grey, fontSize: 13),
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: tierBgColor,
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Text(
-                              '${widget.tierName} ${widget.cashbackPercentage}',
-                              style: TextStyle(
-                                color: tierColor,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
                           ),
                         ],
                       ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const Text(
-                          'Yapa: \$2.40',
-                          style: TextStyle(
-                            color: Color(0xFF4A1587),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${widget.visits} visitas',
-                          style: const TextStyle(color: Colors.grey, fontSize: 13),
-                        ),
-                      ],
+                    // ✅ Dejamos solo el contador de visitas
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(12)
+                      ),
+                      child: Text(
+                        '${widget.visits} visitas',
+                        style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ],
                 ),
@@ -184,7 +164,6 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                 ),
                 const SizedBox(height: 8),
                 
-                // ✅ LOS CIRCULITOS DE YAPA
                 YapaStepIndicator(
                   currentSteps: widget.currentYapas,
                   totalSteps: 5,
@@ -201,49 +180,84 @@ class _LoyaltyBusinessCardState extends State<LoyaltyBusinessCard> {
                     minHeight: 8,
                   ),
                 ),
-                const SizedBox(height: 12),
-                if (widget.purchasesNeeded > 0)
-                  Row(
-                    children: [
-                      Text(
-                        'Progreso ${(widget.progress * 100).toInt()}%  ➔  ',
-                        style: const TextStyle(color: Colors.grey, fontSize: 13),
+                const SizedBox(height: 8),
+                
+                // ✅ Nueva fila minimalista bajo la barra de progreso
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.tierName, // Solo dice "Bronce", "Plata", etc.
+                      style: TextStyle(
+                        color: tierColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
                       ),
-                      Expanded(
-                        child: Text(
-                          'Te ${widget.purchasesNeeded == 1 ? "falta" : "faltan"} ${widget.purchasesNeeded} ${widget.purchasesNeeded == 1 ? "compra" : "compras"} para Yapa ${widget.nextLevel}',
-                          style: TextStyle(
-                            color: tierColor,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
+                    ),
+                    Text(
+                      '${(widget.progress * 100).toInt()}%', // Solo el porcentaje
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Sección "Pasa la Yapa" (Se mantiene intacta)
+                if (_isExpanded) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFAEDFF),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFF3E5F5)),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF4A1587),
+                            shape: BoxShape.circle,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  )
-                else
-                  Row(
-                    children: [
-                      const Text(
-                        'Progreso 100%  ➔  ',
-                        style: TextStyle(color: Colors.grey, fontSize: 13),
-                      ),
-                      Expanded(
-                        child: Text(
-                          '¡Has alcanzado el ${widget.nextLevel}!',
-                          style: TextStyle(
-                            color: tierColor,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
+                          child: const Icon(
+                            Icons.handshake,
+                            color: Color(0xFFFBC02D),
+                            size: 16,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Pasa la Yapa',
+                                style: TextStyle(
+                                  color: Color(0xFF4A1587),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Text(
+                                'Invita a un vecino a ${widget.businessName} y ambos ganan \$0.50',
+                                style: const TextStyle(color: Colors.grey, fontSize: 11),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.arrow_forward_ios,
+                            size: 14, color: Color(0xFF4A1587)),
+                      ],
+                    ),
                   ),
+                ],
               ],
             ),
           ),

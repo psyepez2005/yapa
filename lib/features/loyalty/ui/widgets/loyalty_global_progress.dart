@@ -1,73 +1,93 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class LoyaltyGlobalProgress extends StatelessWidget {
   final int totalYapas;
+  final double totalSaved;
 
   const LoyaltyGlobalProgress({
     super.key,
     required this.totalYapas,
+    required this.totalSaved,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(20),
+      width: double.infinity,
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03), 
-            blurRadius: 10, 
-            offset: const Offset(0, 5)
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           )
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Yapa Total Header
-          Row(
-            children: const [
-              Text('💰', style: TextStyle(fontSize: 16)),
-              SizedBox(width: 8),
-              Text('Yapa total', style: TextStyle(color: Colors.grey, fontSize: 16)),
-            ],
-          ),
-          const SizedBox(height: 4),
-          // Amount and Usar button
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Total de yapas acumuladas',
-                style: TextStyle(color: Colors.grey, fontSize: 16, fontWeight: FontWeight.w500)
-              ),
-              ElevatedButton(
-                onPressed: () => context.pushNamed('my_yapas'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00BFA5),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'Mis yapas',
-                  style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)
-                ),
-              ),
-            ],
+          const Text(
+            'Ahorro total con tus yapas',
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
-            '$totalYapas',
-            style: const TextStyle(color: Color(0xFF00BFA5), fontSize: 48, fontWeight: FontWeight.bold),
+            '\$${totalSaved.toStringAsFixed(2)}',
+            style: const TextStyle(
+              color: Color(0xFF00BFA5), // Turquesa Deuna
+              fontSize: 48,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -1,
+            ),
           ),
-          const Text(
-            '¡Sigue comprando en tu barrio para ganar más!',
-            style: TextStyle(color: Colors.grey, fontSize: 13),
+          const SizedBox(height: 16),
+          const Divider(height: 1),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0FDFA),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.stars_rounded,
+                  color: Color(0xFF00BFA5),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$totalYapas yapas disponibles',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const Text(
+                    'Listas para usar en tus compras',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
       ),

@@ -28,8 +28,11 @@ class LoyaltyDashboardScreen extends StatelessWidget {
       },
     ];
 
-    // ✅ SUMAMOS LAS YAPAS DE TODOS LOS NEGOCIOS (3 + 1 + 5 = 9)
+    // ✅ SUMAMOS LAS YAPAS DE TODOS LOS NEGOCIOS
     final int totalYapasSum = businesses.fold(0, (sum, b) => sum + (b['currentYapas'] as int));
+    
+    // ✅ CREAMOS EL VALOR DE AHORRO (Simulado por ahora)
+    const double ahorroTotal = 15.40;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
@@ -39,8 +42,11 @@ class LoyaltyDashboardScreen extends StatelessWidget {
           children: [
             const LoyaltyHeader(),
             
-            // ✅ LE PASAMOS LA SUMA AL WIDGET GLOBAL
-            LoyaltyGlobalProgress(totalYapas: totalYapasSum),
+            // ✅ CORRECCIÓN AQUÍ: Pasamos amobs parámetros obligatorios
+            LoyaltyGlobalProgress(
+              totalYapas: totalYapasSum,
+              totalSaved: ahorroTotal, // <-- El dato que faltaba
+            ),
 
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -62,7 +68,6 @@ class LoyaltyDashboardScreen extends StatelessWidget {
               nextLevel: b['nextLevel'] as String,
               purchasesNeeded: b['needed'] as int,
               businessIcon: b['icon'] as IconData,
-              // ✅ LE PASAMOS LAS YAPAS INDIVIDUALES (0 a 5)
               currentYapas: b['currentYapas'] as int,
             )).toList(),
 
